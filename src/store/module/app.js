@@ -11,7 +11,7 @@ import {
   localSave,
   localRead
 } from '@/libs/util'
-import { saveErrorLogger } from '@/api/data'
+import { saveErrorLogger, getSysEnums, getOrganizationList } from '@/api/data'
 import router from '@/router'
 import routers from '@/router/routers'
 import config from '@/config'
@@ -32,11 +32,28 @@ export default {
     homeRoute: {},
     local: localRead('local'),
     errorList: [],
-    hasReadErrorPage: false
+    hasReadErrorPage: false,
+    sysEnums: localRead('sysEnums') ? JSON.parse(localRead('sysEnums')) : {}
   },
   getters: {
     menuList: (state, getters, rootState) => getMenuByRouter(routers, rootState.user.access),
-    errorCount: state => state.errorList.length
+    errorCount: state => state.errorList.length,
+    sysEnums: state => state.sysEnums,
+    getEnumsByName: state => (enumName) => {
+      return state.sysEnums[enumName]
+    },
+    getEnumLabelByValue: state => (enumName, value) => {
+      let result = ''
+      if (state.sysEnums && state.sysEnums[enumName]) {
+        for (let i = 0; i < state.sysEnums[enumName].length; i++) {
+          if (state.sysEnums[enumName][i].value === value) {
+            result = state.sysEnums[enumName][i].label
+            break
+          }
+        }
+      }
+      return result
+    }
   },
   mutations: {
     setBreadCrumb (state, route) {
@@ -85,6 +102,10 @@ export default {
     },
     setHasReadErrorLoggerStatus (state, status = true) {
       state.hasReadErrorPage = status
+    },
+    setSysEnums (state, sysEnums) {
+      localSave('sysEnums', JSON.stringify(sysEnums))
+      state.sysEnums = sysEnums
     }
   },
   actions: {
@@ -100,6 +121,20 @@ export default {
       }
       saveErrorLogger(info).then(() => {
         commit('addError', data)
+      })
+    },
+    getSysEnums ({ commit, rootState }) {
+      return new Promise((resolve, reject) => {
+        try {
+          getSysEnums().then(res => {
+            commit('setSysEnums', res.data)
+            resolve(res)
+          }).catch(err => {
+            reject(err)
+          })
+        } catch (error) {
+          reject(error)
+        }
       })
     }
   }

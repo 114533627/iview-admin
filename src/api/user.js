@@ -1,31 +1,30 @@
 import axios from '@/libs/api.request'
+const grantType = 'password'
+const scope = 'read'
+const basicAuthorization = 'Basic ' + btoa('web_app:spring-microservice-exam-secret')
 
-export const login = ({ userName, password }) => {
-  const data = {
-    userName,
-    password
-  }
+export const login = ({ username, password, code, randomStr }) => {
   return axios.request({
-    url: 'login',
-    data,
-    method: 'post'
+    url: '/oauth/token',
+    headers: {
+      'Authorization': basicAuthorization
+    },
+    method: 'post',
+    params: { username, password, code, randomStr, grant_type: grantType, scope }
   })
 }
 
 export const getUserInfo = (token) => {
   return axios.request({
-    url: 'get_info',
-    params: {
-      token
-    },
+    url: '/v1/user',
     method: 'get'
   })
 }
 
 export const logout = (token) => {
   return axios.request({
-    url: 'logout',
-    method: 'post'
+    url: '/v1/authentication/remove_token',
+    method: 'get'
   })
 }
 

@@ -35,6 +35,16 @@ class HttpRequest {
   interceptors (instance, url) {
     // 请求拦截
     instance.interceptors.request.use(config => {
+      let token = store.getters.token
+      if (token) {
+        const authorization = config.headers['Authorization']
+        if (authorization === undefined || authorization.indexOf('Basic') === -1) {
+          config.headers['Authorization'] = 'Bearer ' + token // 让每个请求携带
+        }
+      }
+      // config.headers['Referer'] = this.baseUrl
+      // config.headers['Origin'] = this.baseUrl
+      // console.log(JSON.stringify(config))
       // 添加全局的loading...
       if (!Object.keys(this.queue).length) {
         // Spin.show() // 不建议开启，因为界面不友好
@@ -48,7 +58,8 @@ class HttpRequest {
     instance.interceptors.response.use(res => {
       this.destroy(url)
       const { data, status } = res
-      return { data, status }
+      if (data.code && data.code !== 200) return Promise.reject(data)
+      return data
     }, error => {
       this.destroy(url)
       let errorInfo = error.response

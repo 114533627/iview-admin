@@ -8,7 +8,7 @@
       <Card icon="log-in" title="欢迎登录" :bordered="false">
         <div class="form-con">
           <login-form @on-success-valid="handleSubmit"></login-form>
-          <p class="login-tip">输入任意用户名和密码即可</p>
+<!--          <p class="login-tip">输入任意用户名和密码即可</p>-->
         </div>
       </Card>
     </div>
@@ -25,15 +25,20 @@ export default {
   methods: {
     ...mapActions([
       'handleLogin',
-      'getUserInfo'
+      'getUserInfo',
+      'getSysEnums'
     ]),
-    handleSubmit ({ userName, password }) {
-      this.handleLogin({ userName, password }).then(res => {
-        this.getUserInfo().then(res => {
+    handleSubmit (form) {
+      this.handleLogin(form).then(res => {
+        this.getUserInfo().then(async (res) => {
+          await this.getSysEnums()
           this.$router.push({
             name: this.$config.homeName
           })
         })
+      }).catch(err => {
+        console.log(err)
+        this.$Message.error(err.data ? err.data : err.desc)
       })
     }
   }

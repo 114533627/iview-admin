@@ -9,7 +9,7 @@ import {
   restoreTrash,
   getUnreadCount
 } from '@/api/user'
-import { setToken, getToken } from '@/libs/util'
+import { setToken, getToken, encryption, getRefreshToken, setRefreshToken } from '@/libs/util'
 
 export default {
   state: {
@@ -17,6 +17,7 @@ export default {
     userId: '',
     avatarImgPath: '',
     token: getToken(),
+    refresh_token: getRefreshToken(),
     access: '',
     hasGetInfo: false,
     unreadCount: 0,
@@ -41,6 +42,10 @@ export default {
     setToken (state, token) {
       state.token = token
       setToken(token)
+    },
+    setRefreshToken (state, refresh_token) {
+      state.refresh_token = refresh_token
+      setRefreshToken(refresh_token)
     },
     setHasGetInfo (state, status) {
       state.hasGetInfo = status
@@ -70,19 +75,23 @@ export default {
   getters: {
     messageUnreadCount: state => state.messageUnreadList.length,
     messageReadedCount: state => state.messageReadedList.length,
-    messageTrashCount: state => state.messageTrashList.length
+    messageTrashCount: state => state.messageTrashList.length,
+    token: state => state.token,
+    refresh_token: state => state.refresh_token
   },
   actions: {
     // 登录
-    handleLogin ({ commit }, { userName, password }) {
-      userName = userName.trim()
+    handleLogin ({ commit }, formData) {
       return new Promise((resolve, reject) => {
-        login({
-          userName,
-          password
-        }).then(res => {
-          const data = res.data
-          commit('setToken', data.token)
+        const param = encryption({
+          data: formData,
+          key: '1234567887654321',
+          param: ['password']
+        })
+        param.username = param.username.trim()
+        login(param).then(res => {
+          commit('setToken', res.access_token)
+          commit('setRefreshToken', res.refresh_token)
           resolve()
         }).catch(err => {
           reject(err)
@@ -92,8 +101,9 @@ export default {
     // 退出登录
     handleLogOut ({ state, commit }) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
+        logout().then(() => {
           commit('setToken', '')
+          commit('setRefreshToken', '')
           commit('setAccess', [])
           resolve()
         }).catch(err => {
@@ -113,8 +123,8 @@ export default {
             const data = res.data
             commit('setAvatar', data.avatar)
             commit('setUserName', data.name)
-            commit('setUserId', data.user_id)
-            commit('setAccess', data.access)
+            commit('setUserId', data.id)
+            commit('setAccess', 'home')
             commit('setHasGetInfo', true)
             resolve(data)
           }).catch(err => {

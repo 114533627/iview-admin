@@ -24,4 +24,8 @@ html,body{
 #app {
   .size;
 }
+.ivu-table-cell {
+  padding-left: 5px!important;
+  padding-right: 5px!important;
+}
 </style>

@@ -1,19 +1,67 @@
-import Cookies from 'js-cookie'
+// import Cookies from 'js-cookie'
+import { setStorage, getStorage, removeStorage } from './storage'
+import CryptoJS from 'crypto-js'
 // cookie保存的天数
 import config from '@/config'
 import { forEach, hasOneOf, objEqual } from '@/libs/tools'
 const { title, cookieExpires, useI18n } = config
 
+/**
+ * 加密处理
+ */
+export const encryption = (params) => {
+  var {
+    data,
+    type,
+    param,
+    key
+  } = params
+  const result = JSON.parse(JSON.stringify(data))
+  if (type === 'Base64') {
+    param.forEach(ele => {
+      result[ele] = btoa(result[ele])
+    })
+  } else {
+    param.forEach(ele => {
+      var data = result[ele]
+      key = CryptoJS.enc.Latin1.parse(key)
+      var iv = key
+      var encrypted = CryptoJS.AES.encrypt(
+        data,
+        key, {
+          iv: iv,
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.ZeroPadding
+        })
+      result[ele] = encrypted.toString()
+    })
+  }
+  return result
+}
+
 export const TOKEN_KEY = 'token'
 
 export const setToken = (token) => {
-  Cookies.set(TOKEN_KEY, token, { expires: cookieExpires || 1 })
+  // Cookies.set(TOKEN_KEY, token, { expires: cookieExpires || 1 })
+  setStorage({ name: TOKEN_KEY, content: token, type: 'string' })
 }
 
 export const getToken = () => {
-  const token = Cookies.get(TOKEN_KEY)
+  const token = getStorage({ name: TOKEN_KEY })
   if (token) return token
   else return false
+}
+
+export const getRefreshToken = () => {
+  return getStorage({ name: 'refresh_token' })
+}
+
+export const setRefreshToken = (token) => {
+  return setStorage({ name: 'refresh_token', content: token, type: 'string' })
+}
+
+export const removeRefreshToken = () => {
+  return removeStorage({ name: 'refresh_token' })
 }
 
 export const hasChild = (item) => {
