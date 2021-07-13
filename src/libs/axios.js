@@ -58,7 +58,7 @@ class HttpRequest {
     instance.interceptors.response.use(res => {
       this.destroy(url)
       const { data, status } = res
-      if (data.code && data.code !== 200) return Promise.reject(data)
+      if (data.code && data.code !== 200) return Promise.reject()
       return data
     }, error => {
       this.destroy(url)

@@ -10,12 +10,17 @@
             <Option v-for="item in langTypeEnums" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
         </FormItem>
+        <FormItem prop="type">
+          <Select v-model="searchParams.type" clearable style="width:200px" placeholder="请选择类型">
+            <Option v-for="item in articleTypeEnums" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
+        </FormItem>
         <FormItem>
           <Button type="primary" @click="getDataList()">查询</Button>
         </FormItem>
-<!--        <FormItem>-->
-<!--          <Button type="primary" @click="addHandle">添加</Button>-->
-<!--        </FormItem>-->
+<!--        <FormItem>
+          <Button type="primary" @click="addHandle">添加</Button>
+        </FormItem>-->
       </Form>
     </div>
     <div class="content">
@@ -33,7 +38,7 @@
       :title="boxTitle"
       @on-ok="okHandle"
       @on-cancel="cancelHandle">
-      <organization-edit ref="edit" :item="item" :operate="operate" @editOk="editOkHandle"></organization-edit>
+      <article-edit ref="edit" :item="item" :operate="operate" @editOk="editOkHandle"></article-edit>
     </Modal>
     <Modal
       v-model="boxShow2"
@@ -41,7 +46,7 @@
       title="SEO设置"
       @on-ok="okHandle2"
       @on-cancel="cancelHandle2">
-      <seo-edit ref="seo" table-name="organization" :target-id="targetId" article-type="org" @seoOk="seoOkHandle"></seo-edit>
+      <seo-edit ref="seo" table-name="article" :article-type="articleType" :target-id="targetId" @seoOk="seoOkHandle"></seo-edit>
     </Modal>
   </Card>
 </template>
@@ -49,30 +54,30 @@
 <script>
 import { mapGetters } from 'vuex'
 import Operate from '../../components/common/Operate'
-import OrganizationEdit from '../../components/organization/organizationEdit'
+import ArticleEdit from '../../components/article/articleEdit'
 import SeoEdit from '../../components/common/SeoEdit'
 
 export default {
-  name: 'OrganizationList',
-  components: { Operate, OrganizationEdit, SeoEdit },
+  name: 'articleList',
+  components: { Operate, ArticleEdit, SeoEdit },
   computed: {
     ...mapGetters(['getEnumsByName', 'getEnumLabelByValue']),
-    orgTypeEnums () {
-      return this.getEnumsByName('OrgType')
-    },
     langTypeEnums () {
       return this.getEnumsByName('LangType')
+    },
+    articleTypeEnums () {
+      return this.getEnumsByName('ArticleType')
     }
   },
   data () {
     return {
-      loadingModal: true,
-      users: [],
+      orgs: [],
+      articleType: '',
       targetId: 0,
       boxShow2: false,
       operate: 'add',
       boxShow: false,
-      boxTitle: '添加机构信息',
+      boxTitle: '添加内容信息',
       loading: false,
       dataList: [],
       searchParams: {
@@ -80,8 +85,8 @@ export default {
       },
       page_info: {
         page: 1,
-        limit: 20,
-        total: 10
+        limit: 10,
+        total: 0
       },
       item: {},
       columns: [
@@ -91,12 +96,7 @@ export default {
           key: 'id'
         },
         {
-          title: '所属用户',
-          width: 60,
-          key: 'username'
-        },
-        {
-          title: '名称',
+          title: '标题',
           width: 120,
           key: 'name'
         },
@@ -107,7 +107,7 @@ export default {
           render: (h, { row, column, index }) => {
             return h('span', {
               domProps: {
-                innerHTML: this.getEnumLabelByValue('OrgType', row.type)
+                innerHTML: this.getEnumLabelByValue('ArticleType', row.type)
               }
             })
           }
@@ -125,21 +125,54 @@ export default {
           }
         },
         {
-          title: '代号',
+          title: '所属机构',
           width: 80,
-          key: 'code'
+          key: 'org_id',
+          render: (h, { row, column, index }) => {
+            return h('span', {
+              domProps: {
+                innerHTML: this.getOrgNameById(row.org_id)
+              }
+            })
+          }
         },
         {
-          title: 'logo',
+          title: '关联类型',
+          width: 80,
+          key: 'org_arti_type',
+          render: (h, { row, column, index }) => {
+            return h('span', {
+              domProps: {
+                innerHTML: this.getEnumLabelByValue('OrgArtiType', row.org_arti_type)
+              },
+              'class': 'list-img'
+            })
+          }
+        },
+        {
+          title: '图片',
           width: 80,
           align: 'center',
-          key: 'logo',
+          key: 'img_url',
           render: (h, { row, column, index }) => {
             return h('img', {
               attrs: {
-                src: row.logo
+                src: row.img_url
               },
               'class': 'list-img'
+            })
+          }
+        },
+        {
+          title: 'introduction',
+          width: 80,
+          align: 'center',
+          key: 'img_url',
+          render: (h, { row, column, index }) => {
+            return h('div', {
+              domProps: {
+                innerHTML: row.introduction && row.introduction.length > 20 ? row.introduction.substring(0, 17) + '...' : row.introduction
+              }
             })
           }
         },
@@ -151,21 +184,17 @@ export default {
         },
         {
           title: '操作',
-          width: 330,
+          width: 150,
           render: (h, { row, column, index }) => {
             return h(Operate, {
               props: {
-                need: { edit: true, seo: true, jujiao: true, ljgd: true, hdrl: true, csdsj: true },
+                need: { detail: false, edit: true, del: true, seo: true },
                 rowData: row
               },
               on: {
                 edit: this.editHandle,
                 del: this.delHandle,
-                seo: this.seoHandle,
-                jujiao: this.jujiaoHandle,
-                ljgd: this.ljgdHandle,
-                hdrl: this.hdrlHandle,
-                csdsj: this.csdsjHandle
+                seo: this.seoHandle
               }
             })
           }
@@ -173,7 +202,8 @@ export default {
       ]
     }
   },
-  created () {
+  async created () {
+    await this.getOrgs()
     this.getDataList()
   },
   mounted () {
@@ -194,7 +224,7 @@ export default {
     getDataList () {
       this.loading = true
       let params = { ...this.searchParams, ...this.page_info }
-      this.$api.getOrganizationList(params).then(res => {
+      this.$api.getArticleList(params).then(res => {
         this.loading = false
         if (res.code === 200) {
           this.dataList = res.data
@@ -205,9 +235,36 @@ export default {
         this.$Message.error(err)
       })
     },
+    async getOrgs () {
+      try {
+        let param = { page: 1, limit: 1000 }
+        console.log(param)
+        let res = await this.$api.getOrganizationList(param)
+        if (res.code === 200) {
+          const list = res.data.map(item => {
+            return {
+              value: item.id,
+              label: item.name
+            }
+          })
+          this.orgs = list
+        } else {
+          this.orgs = []
+        }
+      } catch (e) {
+        this.$Message.error(e)
+        this.orgs = []
+      }
+    },
+    getOrgNameById (id) {
+      for (let orgsKey in this.orgs) {
+        if (this.orgs[orgsKey].value === id) return this.orgs[orgsKey].label
+      }
+      return id
+    },
     addHandle () {
       this.item = {}
-      this.edit('添加机构信息', 'add')
+      this.edit('添加内容信息', 'add')
     },
     edit (title, operate) {
       this.boxShow = true
@@ -216,45 +273,17 @@ export default {
     },
     editHandle (row) {
       this.item = { ...row }
-      this.edit('编辑机构信息', 'update')
+      this.edit('编辑内容信息', 'update')
     },
     delHandle (row) {
-      this.$api.delOrganization(row).then(res => {
+      this.$api.delArticle(row).then(res => {
         if (res.code === 1) this.$Message.success('删除成功')
         else this.$Message.success(res.desc)
         this.getDataList()
       })
     },
-    // 聚焦图集
-    jujiaoHandle (row) {
-      this.$router.push({
-        name: 'organizationArticles',
-        query: { org_id: row.id, org_arti_type: 'jujiao', name: row.name }
-      })
-    },
-    // 了解更多
-    ljgdHandle (row) {
-      this.$router.push({
-        name: 'organizationArticles',
-        query: { org_id: row.id, org_arti_type: 'ljgd', name: row.name }
-      })
-    },
-    // 活动日历管理
-    hdrlHandle (row) {
-      this.$router.push({
-        name: 'organizationArticles',
-        query: { org_id: row.id, org_arti_type: 'hdrl', name: row.name }
-      })
-    },
-    // 城市大事件管理
-    csdsjHandle (row) {
-      this.$router.push({
-        name: 'organizationArticles',
-        query: { org_id: row.id, org_arti_type: 'csdsj', name: row.name }
-      })
-    },
     okHandle () {
-      // modal 的 ok的逻辑在 mounted 重定义了
+      this.$refs.edit.handleSubmit()
     },
     cancelHandle () {
       this.$refs.edit.handleCancel()
@@ -264,9 +293,13 @@ export default {
       this.getDataList()
     },
     seoHandle (row) {
-      console.log(row.id)
-      this.targetId = row.id
-      this.boxShow2 = true
+      if (row.type === 'img') this.$Message.warning('图片类型的内容，无需维护seo')
+      else {
+        console.log(row.id)
+        this.targetId = row.id
+        this.articleType = row.type
+        this.boxShow2 = true
+      }
     },
     okHandle2 () {
       this.$refs.seo.handleSubmit()

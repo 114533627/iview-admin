@@ -151,6 +151,7 @@ export default {
   },
   watch: {
     '$route' (newRoute) {
+      console.log('....>>')
       const { name, query, params, meta } = newRoute
       this.addTag({
         route: { name, query, params, meta },
@@ -169,7 +170,8 @@ export default {
     this.setHomeRoute(routers)
     const { name, params, query, meta } = this.$route
     this.addTag({
-      route: { name, params, query, meta }
+      route: { name, params, query, meta },
+      type: 'push'
     })
     this.setBreadCrumb(this.$route)
     // 设置初始语言

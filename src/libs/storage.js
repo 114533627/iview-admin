@@ -16,7 +16,7 @@ export const setStorage = (params) => {
     id: 0
   }
   // 直接放到sessionStorage
-  window.sessionStorage.setItem(name, JSON.stringify(obj))
+  window.localStorage.setItem(name, JSON.stringify(obj))
 }
 /**
  * 获取sessionStorage
@@ -27,7 +27,7 @@ export const getStorage = (params) => {
   } = params
   let obj = {}
   let content
-  obj = window.sessionStorage.getItem(name)
+  obj = window.localStorage.getItem(name)
   if (validatenull(obj)) return
   obj = JSON.parse(obj)
   if (obj.dataType === 'string') {
@@ -46,5 +46,5 @@ export const removeStorage = params => {
   const {
     name
   } = params
-  window.sessionStorage.removeItem(name)
+  window.localStorage.removeItem(name)
 }

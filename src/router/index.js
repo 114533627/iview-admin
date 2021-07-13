@@ -6,10 +6,11 @@ import iView from 'iview'
 import { setToken, getToken, canTurnTo, setTitle } from '@/libs/util'
 import config from '@/config'
 const { homeName } = config
-
+const BASE = process.env.NODE_ENV === 'production' ? 'admin' : ''
 Vue.use(Router)
 const router = new Router({
   routes,
+  base: BASE,
   mode: 'history'
 })
 const LOGIN_PAGE_NAME = 'login'

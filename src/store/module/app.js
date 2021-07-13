@@ -83,6 +83,7 @@ export default {
       closePage(state, route)
     },
     addTag (state, { route, type = 'unshift' }) {
+      console.log(type)
       let router = getRouteTitleHandled(route)
       if (!routeHasExist(state.tagNavList, router)) {
         if (type === 'push') state.tagNavList.push(router)

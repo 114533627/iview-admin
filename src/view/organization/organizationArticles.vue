@@ -1,30 +1,17 @@
 <template>
   <Card>
     <div slot="title">
-      <Form ref="form" :model="searchParams" inline>
-        <FormItem prop="kwd">
-          <Input v-model="searchParams.kwd" clearable placeholder="搜索关键词"></Input>
-        </FormItem>
-        <FormItem prop="lang">
-          <Select v-model="searchParams.lang" clearable style="width:200px" placeholder="请选择语言">
-            <Option v-for="item in langTypeEnums" :value="item.value" :key="item.value">{{ item.label }}</Option>
-          </Select>
-        </FormItem>
+      <Form inline>
         <FormItem>
-          <Button type="primary" @click="getDataList()">查询</Button>
+          {{title}}
         </FormItem>
-<!--        <FormItem>-->
-<!--          <Button type="primary" @click="addHandle">添加</Button>-->
-<!--        </FormItem>-->
+        <FormItem v-if="!(orgArtiType==='ljgd' && dataList.length>=1)">
+          <Button type="primary" @click="addHandle">添加</Button>
+        </FormItem>
       </Form>
     </div>
     <div class="content">
       <Table border :loading="loading" ref="selection" :columns="columns" :data="dataList"></Table>
-      <Page style="margin: 0 auto; width: 50%;"
-            :current="page_info.page" :total="page_info.total" :page-size="page_info.limit" show-elevator show-sizer
-            @on-change="pageChangeHandle"
-            @on-page-size-change="limitChangeHandle"
-      />
     </div>
     <Modal
       ref="editModal"
@@ -33,7 +20,7 @@
       :title="boxTitle"
       @on-ok="okHandle"
       @on-cancel="cancelHandle">
-      <organization-edit ref="edit" :item="item" :operate="operate" @editOk="editOkHandle"></organization-edit>
+      <article-edit ref="edit" :item="item" :operate="operate" :org-arti-type="orgArtiType" @editOk="editOkHandle"></article-edit>
     </Modal>
     <Modal
       v-model="boxShow2"
@@ -41,38 +28,58 @@
       title="SEO设置"
       @on-ok="okHandle2"
       @on-cancel="cancelHandle2">
-      <seo-edit ref="seo" table-name="organization" :target-id="targetId" article-type="org" @seoOk="seoOkHandle"></seo-edit>
+      <seo-edit ref="seo" table-name="article" :article-type="articleType" :target-id="targetId" @seoOk="seoOkHandle"></seo-edit>
     </Modal>
   </Card>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import Operate from '../../components/common/Operate'
-import OrganizationEdit from '../../components/organization/organizationEdit'
+import ArticleEdit from '../../components/article/articleEdit'
 import SeoEdit from '../../components/common/SeoEdit'
 
 export default {
-  name: 'OrganizationList',
-  components: { Operate, OrganizationEdit, SeoEdit },
+  name: 'organizationArticles',
+  components: { Operate, ArticleEdit, SeoEdit },
   computed: {
     ...mapGetters(['getEnumsByName', 'getEnumLabelByValue']),
-    orgTypeEnums () {
-      return this.getEnumsByName('OrgType')
-    },
     langTypeEnums () {
       return this.getEnumsByName('LangType')
+    },
+    articleTypeEnums () {
+      return this.getEnumsByName('ArticleType')
+    },
+    orgArtiTypeEnums () {
+      return this.getEnumsByName('OrgArtiType')
+    },
+    title () {
+      let { name, org_arti_type } = this.$route.query
+      return '机构：' + name + ' > ' + this.getEnumLabelByValue('OrgArtiType', org_arti_type)
+    },
+    orgArtiType () {
+      let { org_arti_type } = this.$route.query
+      if (this.getEnumLabelByValue('OrgArtiType', org_arti_type)) {
+        return org_arti_type
+      }
+      return 'jujiao'
+    },
+    orgId () {
+      let { org_id } = this.$route.query
+      return org_id
     }
   },
   data () {
     return {
-      loadingModal: true,
-      users: [],
+      show: false,
+      item: {},
+
+      articleType: '',
       targetId: 0,
       boxShow2: false,
       operate: 'add',
       boxShow: false,
-      boxTitle: '添加机构信息',
+      boxTitle: '添加内容信息',
       loading: false,
       dataList: [],
       searchParams: {
@@ -80,10 +87,9 @@ export default {
       },
       page_info: {
         page: 1,
-        limit: 20,
-        total: 10
+        limit: 10,
+        total: 0
       },
-      item: {},
       columns: [
         {
           title: 'ID',
@@ -91,12 +97,7 @@ export default {
           key: 'id'
         },
         {
-          title: '所属用户',
-          width: 60,
-          key: 'username'
-        },
-        {
-          title: '名称',
+          title: '标题',
           width: 120,
           key: 'name'
         },
@@ -107,7 +108,7 @@ export default {
           render: (h, { row, column, index }) => {
             return h('span', {
               domProps: {
-                innerHTML: this.getEnumLabelByValue('OrgType', row.type)
+                innerHTML: this.getEnumLabelByValue('ArticleType', row.type)
               }
             })
           }
@@ -125,21 +126,34 @@ export default {
           }
         },
         {
-          title: '代号',
+          title: '所属机构',
           width: 80,
-          key: 'code'
+          key: 'org_id'
         },
         {
-          title: 'logo',
+          title: '图片',
           width: 80,
           align: 'center',
-          key: 'logo',
+          key: 'img_url',
           render: (h, { row, column, index }) => {
             return h('img', {
               attrs: {
-                src: row.logo
+                src: row.img_url
               },
               'class': 'list-img'
+            })
+          }
+        },
+        {
+          title: 'introduction',
+          width: 80,
+          align: 'center',
+          key: 'img_url',
+          render: (h, { row, column, index }) => {
+            return h('div', {
+              domProps: {
+                innerHTML: row.introduction && row.introduction.length > 20 ? row.introduction.substring(0, 17) + '...' : row.introduction
+              }
             })
           }
         },
@@ -151,21 +165,17 @@ export default {
         },
         {
           title: '操作',
-          width: 330,
+          width: 150,
           render: (h, { row, column, index }) => {
             return h(Operate, {
               props: {
-                need: { edit: true, seo: true, jujiao: true, ljgd: true, hdrl: true, csdsj: true },
+                need: { detail: false, edit: true, del: true, seo: true },
                 rowData: row
               },
               on: {
                 edit: this.editHandle,
                 del: this.delHandle,
-                seo: this.seoHandle,
-                jujiao: this.jujiaoHandle,
-                ljgd: this.ljgdHandle,
-                hdrl: this.hdrlHandle,
-                csdsj: this.csdsjHandle
+                seo: this.seoHandle
               }
             })
           }
@@ -177,28 +187,27 @@ export default {
     this.getDataList()
   },
   mounted () {
+    if (!this.orgId || !typeof (this.orgId) === 'number') {
+      this.$Modal.confirm({
+        content: 'orgId 不能为空，请检查',
+        onCancel: () => this.closeTag(this.$route),
+        onOk: () => this.closeTag(this.$route)
+      })
+    }
     this.$refs.editModal.ok = () => {
       this.$refs.edit.handleSubmit()
     }
   },
   methods: {
-    pageChangeHandle (page) {
-      this.page_info.page = page
-      this.getDataList()
-    },
-    limitChangeHandle (limit) {
-      this.page_info.limit = limit
-      this.page_info.page = 1
-      this.getDataList()
-    },
+    ...mapMutations(['closeTag']),
     getDataList () {
+      let { org_id, org_arti_type } = this.$route.query
       this.loading = true
-      let params = { ...this.searchParams, ...this.page_info }
-      this.$api.getOrganizationList(params).then(res => {
+      let params = { orgId: org_id, orgArtiType: org_arti_type, page: 1, limit: 1000 }
+      this.$api.getArticleList(params).then(res => {
         this.loading = false
         if (res.code === 200) {
           this.dataList = res.data
-          this.page_info.total = res.page_info.total
         }
       }).catch(err => {
         this.loading = false
@@ -206,8 +215,8 @@ export default {
       })
     },
     addHandle () {
-      this.item = {}
-      this.edit('添加机构信息', 'add')
+      this.item = { org_arti_type: this.orgArtiType, org_id: this.orgId }
+      this.edit('添加内容信息', 'add')
     },
     edit (title, operate) {
       this.boxShow = true
@@ -215,46 +224,18 @@ export default {
       this.operate = operate
     },
     editHandle (row) {
-      this.item = { ...row }
-      this.edit('编辑机构信息', 'update')
+      this.item = row
+      this.edit('编辑内容信息', 'update')
     },
     delHandle (row) {
-      this.$api.delOrganization(row).then(res => {
+      this.$api.delArticle(row).then(res => {
         if (res.code === 1) this.$Message.success('删除成功')
         else this.$Message.success(res.desc)
         this.getDataList()
       })
     },
-    // 聚焦图集
-    jujiaoHandle (row) {
-      this.$router.push({
-        name: 'organizationArticles',
-        query: { org_id: row.id, org_arti_type: 'jujiao', name: row.name }
-      })
-    },
-    // 了解更多
-    ljgdHandle (row) {
-      this.$router.push({
-        name: 'organizationArticles',
-        query: { org_id: row.id, org_arti_type: 'ljgd', name: row.name }
-      })
-    },
-    // 活动日历管理
-    hdrlHandle (row) {
-      this.$router.push({
-        name: 'organizationArticles',
-        query: { org_id: row.id, org_arti_type: 'hdrl', name: row.name }
-      })
-    },
-    // 城市大事件管理
-    csdsjHandle (row) {
-      this.$router.push({
-        name: 'organizationArticles',
-        query: { org_id: row.id, org_arti_type: 'csdsj', name: row.name }
-      })
-    },
     okHandle () {
-      // modal 的 ok的逻辑在 mounted 重定义了
+      this.$refs.edit.handleSubmit()
     },
     cancelHandle () {
       this.$refs.edit.handleCancel()
@@ -264,9 +245,13 @@ export default {
       this.getDataList()
     },
     seoHandle (row) {
-      console.log(row.id)
-      this.targetId = row.id
-      this.boxShow2 = true
+      if (row.type === 'img') this.$Message.warning('图片类型的内容，无需维护seo')
+      else {
+        console.log(row.id)
+        this.targetId = row.id
+        this.articleType = row.type
+        this.boxShow2 = true
+      }
     },
     okHandle2 () {
       this.$refs.seo.handleSubmit()

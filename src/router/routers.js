@@ -60,6 +60,25 @@ export default [
   //   }
   // },
   {
+    path: '/area',
+    name: 'area',
+    component: Main,
+    meta: {
+      hideInBread: true
+    },
+    children: [
+      {
+        path: 'list',
+        name: 'areaList',
+        meta: {
+          icon: '_qq',
+          title: '区域管理'
+        },
+        component: () => import('@/view/area/areaList.vue')
+      }
+    ]
+  },
+  {
     path: '/organization',
     name: 'organization',
     component: Main,
@@ -69,12 +88,53 @@ export default [
     children: [
       {
         path: 'list',
-        name: 'list',
+        name: 'organizationList',
         meta: {
           icon: '_qq',
           title: '机构管理'
         },
         component: () => import('@/view/organization/organizationList.vue')
+      },
+      {
+        path: 'jujiao',
+        name: 'organizationArticles',
+        meta: {
+          hideInMenu: true,
+          title: function (route) {
+            let { name, org_arti_type } = route.query
+            let title = '机构(' + name + ') > '
+            if (org_arti_type === 'jujiao') {
+              title += '聚焦'
+            } else if (org_arti_type === 'csdsj') {
+              title += '城市大事件'
+            } else if (org_arti_type === 'hdrl') {
+              title += '活动日历'
+            } else if (org_arti_type === 'ljgd') {
+              title += '了解更多'
+            }
+            return title
+          }
+        },
+        component: () => import('@/view/organization/organizationArticles.vue')
+      }
+    ]
+  },
+  {
+    path: '/article',
+    name: 'article',
+    component: Main,
+    meta: {
+      hideInBread: true
+    },
+    children: [
+      {
+        path: 'list',
+        name: 'articleList',
+        meta: {
+          icon: '_qq',
+          title: '内容管理'
+        },
+        component: () => import('@/view/article/articleList.vue')
       }
     ]
   }
