@@ -86,7 +86,8 @@ export default {
       page_info: {
         page: 1,
         limit: 10,
-        total: 0
+        total: 0,
+        orderBy: 'article.modified_time'
       },
       item: {},
       columns: [
@@ -177,10 +178,30 @@ export default {
           }
         },
         {
+          title: '发布时间',
+          width: 80,
+          key: 'deploy_time'
+        },
+        {
+          title: '开始时间',
+          width: 80,
+          key: 'start_time'
+        },
+        {
+          title: '结束时间',
+          width: 80,
+          key: 'end_time'
+        },
+        {
           title: '中英对应版ID',
           width: 100,
           align: 'center',
           key: 'to_id'
+        },
+        {
+          title: '更新时间',
+          width: 80,
+          key: 'modified_time'
         },
         {
           title: '操作',

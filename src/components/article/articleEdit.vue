@@ -202,10 +202,17 @@ export default {
         if (valid) {
           try {
             let res = null
+            let params = { ...this.form }
+            params.deploy_time = this.$dayjs(this.form.deploy_time).format('YYYY-MM-DD HH:mm:ss')
+            if (this.datatimeRange.length > 0) {
+              params.start_time = this.$dayjs(this.datatimeRange[0]).format('YYYY-MM-DD HH:mm:ss')
+              params.end_time = this.$dayjs(this.datatimeRange[1]).format('YYYY-MM-DD HH:mm:ss')
+            }
+
             if (this.operate === 'add') {
-              res = await this.$api.addArticle(this.form)
+              res = await this.$api.addArticle(params)
             } else {
-              res = await this.$api.updateArticle(this.form)
+              res = await this.$api.updateArticle(params)
             }
             console.log(res)
             if (res != null && res.code === 200) {
