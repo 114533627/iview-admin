@@ -60,6 +60,63 @@ export default [
   //   }
   // },
   {
+    path: '/user',
+    name: 'user',
+    component: Main,
+    meta: {
+      hideInBread: true
+    },
+    children: [
+      {
+        path: 'list',
+        name: 'userList',
+        meta: {
+          icon: '_qq',
+          title: '用户管理'
+        },
+        component: () => import('@/view/user/userList.vue')
+      }
+    ]
+  },
+  {
+    path: '/role',
+    name: 'role',
+    component: Main,
+    meta: {
+      hideInBread: true
+    },
+    children: [
+      {
+        path: 'list',
+        name: 'roleList',
+        meta: {
+          icon: '_qq',
+          title: '角色管理'
+        },
+        component: () => import('@/view/role/roleList.vue')
+      }
+    ]
+  },
+  {
+    path: '/privileges',
+    name: 'privileges',
+    component: Main,
+    meta: {
+      hideInBread: true
+    },
+    children: [
+      {
+        path: 'list',
+        name: 'privilegesList',
+        meta: {
+          icon: '_qq',
+          title: '权限管理'
+        },
+        component: () => import('@/view/privileges/privilegesList.vue')
+      }
+    ]
+  },
+  {
     path: '/area',
     name: 'area',
     component: Main,

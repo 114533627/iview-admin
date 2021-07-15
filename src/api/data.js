@@ -1,4 +1,5 @@
 import axios from '@/libs/api.request'
+import { encryption } from '@/libs/util'
 
 export const getTableData = () => {
   return axios.request({
@@ -51,15 +52,7 @@ export const getSysEnums = () => {
     method: 'get'
   })
 }
-// 获取用户列表
 
-export const getUserList = (params) => {
-  return axios.request({
-    url: '/v1/admin/user',
-    method: 'get',
-    params: params
-  })
-}
 // 获取区域列表
 export const getAreaList = (params) => {
   return axios.request({
@@ -217,6 +210,112 @@ export const updateArticle = (params) => {
 export const delArticle = ({ id }) => {
   return axios.request({
     url: '/v1/article',
+    method: 'delete',
+    params: { id }
+  })
+}
+// 获取用户列表
+export const getUserList = (params) => {
+  return axios.request({
+    url: '/v1/admin/user',
+    method: 'get',
+    params: params
+  })
+}
+// 添加用户信息
+export const addUser = (params) => {
+  const param = encryption({
+    data: params,
+    key: '1234567887654321',
+    param: ['password']
+  })
+  return axios.request({
+    url: '/v1/admin/user',
+    method: 'post',
+    data: param
+  })
+}
+// 修改用户信息
+export const updateUser = (params) => {
+  const param = encryption({
+    data: params,
+    key: '1234567887654321',
+    param: ['password']
+  })
+  return axios.request({
+    url: '/v1/admin/user',
+    method: 'put',
+    data: param
+  })
+}
+// 删除用户信息
+export const delUser = ({ id }) => {
+  return axios.request({
+    url: '/v1/admin/user',
+    method: 'delete',
+    params: { id }
+  })
+}
+// 获取角色列表
+export const getRoleList = (params) => {
+  return axios.request({
+    url: '/v1/admin/role',
+    method: 'get',
+    params: params
+  })
+}
+// 添加角色信息
+export const addRole = (params) => {
+  return axios.request({
+    url: '/v1/admin/role',
+    method: 'post',
+    data: params
+  })
+}
+// 修改角色信息
+export const updateRole = (params) => {
+  return axios.request({
+    url: '/v1/admin/role',
+    method: 'put',
+    data: params
+  })
+}
+// 删除角色信息
+export const delRole = ({ id }) => {
+  return axios.request({
+    url: '/v1/admin/role',
+    method: 'delete',
+    params: { id }
+  })
+}
+// 获取权限列表
+export const getPrivilegesList = (params) => {
+  return axios.request({
+    url: '/v1/admin/privileges',
+    method: 'get',
+    params: params
+  })
+}
+// 添加权限信息
+export const addPrivileges = (params) => {
+  return axios.request({
+    url: '/v1/admin/privileges',
+    method: 'post',
+    data: params
+  })
+}
+// 修改权限信息
+export const updatePrivileges = (params) => {
+  return axios.request({
+    url: '/v1/admin/privileges',
+    method: 'put',
+    data: params
+  })
+}
+// 删除用户信息
+export const delPrivileges = ({ id }) => {
+  return axios.request({
+    url: '/v1/admin/privileges',
     method: 'delete',
     params: { id }
   })
