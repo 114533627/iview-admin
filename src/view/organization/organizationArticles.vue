@@ -6,16 +6,24 @@
         <TabPane label="推荐关联" name="recommend"></TabPane>
       </Tabs>
       <Form inline>
-<!--        <FormItem>-->
-<!--          {{title}}-->
-<!--        </FormItem>-->
-        <FormItem v-if="!(orgArtiType==='ljgd' && dataList.length>=1)">
+        <!--        <FormItem>-->
+        <!--          {{title}}-->
+        <!--        </FormItem>-->
+        <FormItem v-if="!(orgArtiType==='ljgd' && dataList.length>=1) && tab==='self'">
           <Button type="primary" @click="addHandle">添加</Button>
+        </FormItem>
+        <FormItem v-if="orgArtiType!=='ljgd'">
+          <Button type="primary" @click="addRecommendHandle">添加推荐</Button>
+        </FormItem>
+        <FormItem v-if="tab==='recommend' && orgArtiType!=='ljgd' ">
+          <Button type="primary" @click="delRecommendHandle">移除推荐</Button>
         </FormItem>
       </Form>
     </div>
     <div class="content">
-      <Table border :loading="loading" ref="selection" :columns="columns" :data="dataList"></Table>
+      <Table border :loading="loading" ref="selection" :columns="columns" :data="dataList"
+             @on-selection-change="selectionChangeHandle"
+      ></Table>
     </div>
     <Modal
       ref="editModal"
@@ -24,7 +32,8 @@
       :title="boxTitle"
       @on-ok="okHandle"
       @on-cancel="cancelHandle">
-      <article-edit ref="edit" :item="item" :operate="operate" :org-arti-type="orgArtiType" @editOk="editOkHandle"></article-edit>
+      <article-edit ref="edit" :item="item" :operate="operate" :org-arti-type="orgArtiType"
+                    @editOk="editOkHandle"></article-edit>
     </Modal>
     <Modal
       v-model="boxShow2"
@@ -32,16 +41,18 @@
       title="SEO设置"
       @on-ok="okHandle2"
       @on-cancel="cancelHandle2">
-      <seo-edit ref="seo" table-name="article" :article-type="articleType" :target-id="targetId" @seoOk="seoOkHandle"></seo-edit>
+      <seo-edit ref="seo" table-name="article" :article-type="articleType" :target-id="targetId"
+                @seoOk="seoOkHandle"></seo-edit>
     </Modal>
     <!--推荐关联-->
     <Modal
+      ref="relationModal"
       v-model="boxShow3"
       width="800"
       title="推荐关联"
       @on-ok="okHandle3"
       @on-cancel="cancelHandle3">
-        <div>123</div>
+      <article-show-relation-list ref="relation" :item="item" @editOk="editOkHandle"></article-show-relation-list>
     </Modal>
   </Card>
 </template>
@@ -50,11 +61,12 @@
 import { mapGetters, mapMutations } from 'vuex'
 import Operate from '../../components/common/Operate'
 import ArticleEdit from '../../components/article/articleEdit'
+import ArticleShowRelationList from '../../components/article/articleShowRelationList'
 import SeoEdit from '../../components/common/SeoEdit'
 
 export default {
   name: 'organizationArticles',
-  components: { Operate, ArticleEdit, SeoEdit },
+  components: { Operate, ArticleEdit, SeoEdit, ArticleShowRelationList },
   computed: {
     ...mapGetters(['getEnumsByName', 'getEnumLabelByValue']),
     langTypeEnums () {
@@ -92,6 +104,7 @@ export default {
       tab: 'self',
       show: false,
       item: {},
+      selectedRows: [],
       articleType: '',
       targetId: 0,
       boxShow2: false,
@@ -110,6 +123,11 @@ export default {
         total: 0
       },
       columns: [
+        {
+          type: 'selection',
+          width: 60,
+          align: 'center'
+        },
         {
           title: 'ID',
           width: 60,
@@ -236,6 +254,9 @@ export default {
     this.$refs.editModal.ok = () => {
       this.$refs.edit.handleSubmit()
     }
+    this.$refs.relationModal.ok = () => {
+      this.$refs.relation.handleSubmit()
+    }
   },
   methods: {
     ...mapMutations(['closeTag']),
@@ -246,6 +267,11 @@ export default {
       this.$api.getArticleList(params).then(res => {
         this.loading = false
         if (res.code === 200) {
+          if (res.data.length) {
+            res.data.forEach(item => {
+              if (this.tab === 'self' && item.is_recommend) item._disabled = true
+            })
+          }
           this.dataList = res.data
         }
       }).catch(err => {
@@ -255,11 +281,56 @@ export default {
     },
     addHandle () {
       this.item = { org_arti_type: this.orgArtiType, org_id: this.orgId }
+      this.edit('添加内容信息', 'add')
+    },
+    addRecommendHandle () {
       if (this.tab === 'self') {
-        this.edit('添加内容信息', 'add')
+        let text = '添加推荐'
+        this.$Modal.confirm({
+          title: '确认',
+          content: `<p>确认${text}吗？</p>`,
+          onOk: () => {
+            if (this.selectedRows.length) {
+              Promise.all(this.selectedRows.map(item => {
+                let params = { org_id: this.orgId, type: this.orgArtiType, object_id: item.id }
+                return this.$api.addOrgRecommendArticle(params)
+              })).then(res => {
+                this.$Message.success(`${text}成功`)
+                this.getDataList()
+              }).catch(err => {
+                this.$Message.error(err && err.desc ? err.desc : err)
+              })
+            }
+          },
+          onCancel: () => {
+          }
+        })
       } else {
+        this.item = { org_arti_type: this.orgArtiType, org_id: this.orgId }
         this.boxShow3 = true
       }
+    },
+    delRecommendHandle () {
+      let text = '移除推荐'
+      this.$Modal.confirm({
+        title: '确认',
+        content: `<p>确认${text}吗？</p>`,
+        onOk: () => {
+          if (this.selectedRows.length) {
+            Promise.all(this.selectedRows.map(item => {
+              let params = { org_id: this.orgId, type: this.orgArtiType, object_id: item.id }
+              return this.$api.delOrgRecommendArticle(params)
+            })).then(res => {
+              this.getDataList()
+              this.$Message.success(`${text}成功`)
+            }).catch(err => {
+              this.$Message.error(err && err.desc ? err.desc : err)
+            })
+          }
+        },
+        onCancel: () => {
+        }
+      })
     },
     edit (title, operate) {
       this.boxShow = true
@@ -272,8 +343,11 @@ export default {
     },
     delHandle (row) {
       this.$api.delArticle(row).then(res => {
-        if (res.code === 1) this.$Message.success('删除成功')
-        else this.$Message.success(res.desc)
+        if (res.code === 1) {
+          this.$Message.success('删除成功')
+        } else {
+          this.$Message.success(res.desc)
+        }
         this.getDataList()
       })
     },
@@ -284,12 +358,14 @@ export default {
       this.$refs.edit.handleCancel()
     },
     editOkHandle () {
+      this.boxShow3 = false
       this.boxShow = false
       this.getDataList()
     },
     seoHandle (row) {
-      if (row.type === 'img') this.$Message.warning('图片类型的内容，无需维护seo')
-      else {
+      if (row.type === 'img') {
+        this.$Message.warning('图片类型的内容，无需维护seo')
+      } else {
         console.log(row.id)
         this.targetId = row.id
         this.articleType = row.type
@@ -306,10 +382,13 @@ export default {
       // do nothing
     },
     okHandle3 () {
-      // this.$refs.seo.handleSubmit()
+
     },
     cancelHandle3 () {
-      // this.$refs.seo.handleCancel()
+
+    },
+    selectionChangeHandle (rows) {
+      this.selectedRows = rows
     }
   }
 }

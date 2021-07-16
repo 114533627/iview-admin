@@ -150,6 +150,32 @@ export const delOrganization = ({ id }) => {
     params: { id }
   })
 }
+
+// 获取机构关联的内容列表
+export const getOrgCanRecommendArticles = (params) => {
+  return axios.request({
+    url: '/v1/article/can_relation_list',
+    method: 'get',
+    params: params
+  })
+}
+// 添加机构内关联
+export const addOrgRecommendArticle = (params) => {
+  return axios.request({
+    url: '/v1/article/show_location',
+    method: 'post',
+    data: params
+  })
+}
+// 解除机构内关联
+export const delOrgRecommendArticle = (params) => {
+  return axios.request({
+    url: '/v1/article/show_location',
+    method: 'delete',
+    data: params
+  })
+}
+
 // 上传文件
 export const uploadImg = (params) => {
   return axios.request({
