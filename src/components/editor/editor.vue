@@ -50,6 +50,11 @@ export default {
       type: Object
     }
   },
+  watch: {
+    value () {
+      this.setHtml(this.value)
+    }
+  },
   computed: {
     editorId () {
       return `editor${this._uid}`

@@ -1,10 +1,15 @@
 <template>
   <Card>
+
     <div slot="title">
+      <Tabs :value="tab">
+        <TabPane label="自主创建" name="自主创建"></TabPane>
+        <TabPane label="推荐关联" name="推荐关联"></TabPane>
+      </Tabs>
       <Form inline>
-        <FormItem>
-          {{title}}
-        </FormItem>
+<!--        <FormItem>-->
+<!--          {{title}}-->
+<!--        </FormItem>-->
         <FormItem v-if="!(orgArtiType==='ljgd' && dataList.length>=1)">
           <Button type="primary" @click="addHandle">添加</Button>
         </FormItem>
@@ -71,9 +76,9 @@ export default {
   },
   data () {
     return {
+      tab: '自主创建',
       show: false,
       item: {},
-
       articleType: '',
       targetId: 0,
       boxShow2: false,

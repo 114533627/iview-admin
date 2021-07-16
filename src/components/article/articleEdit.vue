@@ -85,6 +85,13 @@ export default {
   watch: {
     item () {
       this.form = { ...this.item }
+      if (this.form.type === 'csdsj' || this.form.type === 'hdrl') {
+        this.datatimeRange = []
+        if (this.form.start_time === 'Invalid Date') this.form.start_time = ''
+        if (this.form.end_time === 'Invalid Date') this.form.end_time = ''
+        if (this.form.start_time) this.datatimeRange.push(this.$dayjs(this.form.start_time, 'YYYY-MM-DD HH:mm:ss').toDate())
+        if (this.form.end_time) this.datatimeRange.push(this.$dayjs(this.form.end_time, 'YYYY-MM-DD HH:mm:ss').toDate())
+      }
     },
     'form.lang': function (value) {
       if (value) {
@@ -204,7 +211,7 @@ export default {
             let res = null
             let params = { ...this.form }
             if (this.form.deploy_time)params.deploy_time = this.$dayjs(this.form.deploy_time).format('YYYY-MM-DD HH:mm:ss')
-            if (this.datatimeRange.length > 0) {
+            if (this.datatimeRange.length > 0 && (this.form.type === 'csdsj' || this.form.type === 'hdrl')) {
               params.start_time = this.$dayjs(this.datatimeRange[0]).format('YYYY-MM-DD HH:mm:ss')
               params.end_time = this.$dayjs(this.datatimeRange[1]).format('YYYY-MM-DD HH:mm:ss')
             }

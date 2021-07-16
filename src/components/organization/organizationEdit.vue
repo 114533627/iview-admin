@@ -7,6 +7,9 @@
       <FormItem label="机构名称" prop="name">
         <Input v-model="form.name" style="width: 60%" placeholder="机构名称"></Input>
       </FormItem>
+      <FormItem label="机构全称" prop="full_name">
+        <Input v-model="form.full_name" style="width: 60%" placeholder="机构全称"></Input>
+      </FormItem>
       <FormItem label="代号" prop="code">
         <Input v-model="form.code" style="width: 60%" placeholder="代号"></Input>
       </FormItem>
