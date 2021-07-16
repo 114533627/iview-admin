@@ -1,10 +1,9 @@
 <template>
   <Card>
-
     <div slot="title">
-      <Tabs :value="tab">
-        <TabPane label="自主创建" name="自主创建"></TabPane>
-        <TabPane label="推荐关联" name="推荐关联"></TabPane>
+      <Tabs v-model="tab">
+        <TabPane label="自主创建" name="self"></TabPane>
+        <TabPane label="推荐关联" name="recommend"></TabPane>
       </Tabs>
       <Form inline>
 <!--        <FormItem>-->
@@ -34,6 +33,15 @@
       @on-ok="okHandle2"
       @on-cancel="cancelHandle2">
       <seo-edit ref="seo" table-name="article" :article-type="articleType" :target-id="targetId" @seoOk="seoOkHandle"></seo-edit>
+    </Modal>
+    <!--推荐关联-->
+    <Modal
+      v-model="boxShow3"
+      width="800"
+      title="推荐关联"
+      @on-ok="okHandle3"
+      @on-cancel="cancelHandle3">
+        <div>123</div>
     </Modal>
   </Card>
 </template>
@@ -74,14 +82,20 @@ export default {
       return org_id
     }
   },
+  watch: {
+    tab () {
+      this.getDataList()
+    }
+  },
   data () {
     return {
-      tab: '自主创建',
+      tab: 'self',
       show: false,
       item: {},
       articleType: '',
       targetId: 0,
       boxShow2: false,
+      boxShow3: false,
       operate: 'add',
       boxShow: false,
       boxTitle: '添加内容信息',
@@ -228,7 +242,7 @@ export default {
     getDataList () {
       let { org_id, org_arti_type } = this.$route.query
       this.loading = true
-      let params = { orgId: org_id, orgArtiType: org_arti_type, page: 1, limit: 1000 }
+      let params = { orgId: org_id, orgArtiType: org_arti_type, page: 1, limit: 1000, tab: this.tab }
       this.$api.getArticleList(params).then(res => {
         this.loading = false
         if (res.code === 200) {
@@ -241,7 +255,11 @@ export default {
     },
     addHandle () {
       this.item = { org_arti_type: this.orgArtiType, org_id: this.orgId }
-      this.edit('添加内容信息', 'add')
+      if (this.tab === 'self') {
+        this.edit('添加内容信息', 'add')
+      } else {
+        this.boxShow3 = true
+      }
     },
     edit (title, operate) {
       this.boxShow = true
@@ -286,6 +304,12 @@ export default {
     },
     seoOkHandle () {
       // do nothing
+    },
+    okHandle3 () {
+      // this.$refs.seo.handleSubmit()
+    },
+    cancelHandle3 () {
+      // this.$refs.seo.handleCancel()
     }
   }
 }

@@ -26,7 +26,7 @@
         </Select>
       </FormItem>
       <FormItem label="x坐标" prop="axis_x">
-        <Input type="number" v-model="form.axis_x" style="width: 60%" placeholder="x坐标"></Input>
+        <Input  v-model="form.axis_x" style="width: 60%" placeholder="x坐标"></Input>
       </FormItem>
       <FormItem label="y坐标" prop="axis_y">
         <Input v-model="form.axis_y" style="width: 60%" placeholder="y坐标"></Input>
