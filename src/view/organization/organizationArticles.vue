@@ -3,7 +3,7 @@
     <div slot="title">
       <Tabs v-model="tab">
         <TabPane label="自主创建" name="self"></TabPane>
-        <TabPane label="推荐关联" name="recommend"></TabPane>
+        <TabPane label="推荐关联" name="recommend" v-if="orgArtiType!=='ljgd'"></TabPane>
       </Tabs>
       <Form inline>
         <!--        <FormItem>-->
