@@ -147,6 +147,12 @@ export default {
       ]
     }
   },
+  watch: {
+    async item () {
+      await this.getDataList()
+      await this.getAreas()
+    }
+  },
   async created () {
     await this.getDataList()
     await this.getAreas()
