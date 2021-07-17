@@ -109,7 +109,7 @@ export default {
         } else {
           this.$Message.error(res.desc)
         }
-      }).catch(err => this.$Message.error(err))
+      }).catch(err => this.$Message.error(err && err.desc ? err.desc : err))
     },
     handleCancel () {
       console.log('cancel edit')

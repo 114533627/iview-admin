@@ -5,11 +5,6 @@
         <FormItem prop="kwd">
           <Input v-model="searchParams.kwd" clearable placeholder="搜索关键词"></Input>
         </FormItem>
-        <FormItem prop="type">
-          <Select v-model="searchParams.type" clearable style="width:200px" placeholder="请选择类型">
-            <Option v-for="item in areaTypeEnums" :value="item.value" :key="item.value">{{ item.label }}</Option>
-          </Select>
-        </FormItem>
         <FormItem>
           <Button type="primary" @click="getDataList()">查询</Button>
         </FormItem>
@@ -43,8 +38,8 @@ export default {
     langTypeEnums () {
       return this.getEnumsByName('LangType')
     },
-    areaTypeEnums () {
-      return this.getEnumsByName('AreaType')
+    articleTypeEnums () {
+      return this.getEnumsByName('ArticleType')
     }
   },
   watch: {
@@ -203,7 +198,7 @@ export default {
     },
     getDataList () {
       this.loading = true
-      let params = { orgId: this.item.org_id, type: this.item.org_arti_type, ...this.page_info }
+      let params = { kwd: this.searchParams.kwd, orgId: this.item.org_id, orgArtiType: this.item.org_arti_type, ...this.page_info }
       this.$api.getOrgCanRecommendArticles(params).then(res => {
         this.loading = false
         if (res.code === 200) {
@@ -215,7 +210,7 @@ export default {
       }).catch(err => {
         this.dataList = []
         this.loading = false
-        this.$Message.error(err)
+        this.$Message.error(err && err.desc ? err.desc : err)
       })
     },
     getOrgNameById (id) {
@@ -240,8 +235,8 @@ export default {
         } else {
           this.orgs = []
         }
-      } catch (e) {
-        this.$Message.error(e)
+      } catch (err) {
+        this.$Message.error(err && err.desc ? err.desc : err)
         this.orgs = []
       }
     },

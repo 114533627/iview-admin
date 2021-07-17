@@ -5,11 +5,6 @@
         <FormItem prop="kwd">
           <Input v-model="searchParams.kwd" clearable placeholder="搜索关键词"></Input>
         </FormItem>
-        <FormItem prop="type">
-          <Select v-model="searchParams.type" clearable style="width:200px" placeholder="请选择类型">
-            <Option v-for="item in userTypeEnums" :value="item.value" :key="item.value">{{ item.label }}</Option>
-          </Select>
-        </FormItem>
         <FormItem>
           <Button type="primary" @click="getDataList()">查询</Button>
         </FormItem>
@@ -35,6 +30,15 @@
       @on-cancel="cancelHandle">
       <user-edit ref="edit" :item="item" :operate="operate" @editOk="editOkHandle"></user-edit>
     </Modal>
+    <Modal
+      ref="roleModal"
+      v-model="boxShow2"
+      width="1000"
+      title="用户角色"
+      @on-ok="okHandle2"
+      @on-cancel="cancelHandle2">
+      <user-role ref="role" :item="item" :operate="operate" @editOk="editOkHandle"></user-role>
+    </Modal>
   </Card>
 </template>
 
@@ -42,10 +46,11 @@
 import { mapGetters } from 'vuex'
 import Operate from '../../components/common/Operate'
 import UserEdit from '../../components/user/userEdit'
+import UserRole from '../../components/user/userRole'
 
 export default {
   name: 'userList',
-  components: { Operate, UserEdit },
+  components: { Operate, UserEdit, UserRole },
   computed: {
     ...mapGetters(['getEnumsByName', 'getEnumLabelByValue']),
     langTypeEnums () {
@@ -60,6 +65,7 @@ export default {
       roles: [],
       operate: 'add',
       boxShow: false,
+      boxShow2: false,
       boxTitle: '添加用户',
       loading: false,
       dataList: [],
@@ -102,7 +108,7 @@ export default {
         },
         {
           title: '电话',
-          width: 80,
+          width: 100,
           key: 'phone'
         },
         {
@@ -121,7 +127,7 @@ export default {
         },
         {
           title: 'email',
-          width: 120,
+          width: 180,
           key: 'email'
         },
         {
@@ -136,12 +142,13 @@ export default {
           render: (h, { row, column, index }) => {
             return h(Operate, {
               props: {
-                need: { edit: true, del: true },
+                need: { edit: true, del: true, role: true },
                 rowData: row
               },
               on: {
                 edit: this.editHandle,
-                del: this.delHandle
+                del: this.delHandle,
+                role: this.roleHandle
               }
             })
           }
@@ -178,7 +185,7 @@ export default {
         }
       }).catch(err => {
         this.loading = false
-        this.$Message.error(err)
+        this.$Message.error(err && err.desc ? err.desc : err)
       })
     },
     // async getOrgs () {
@@ -197,8 +204,8 @@ export default {
     //     } else {
     //       this.orgs = []
     //     }
-    //   } catch (e) {
-    //     this.$Message.error(e)
+    //   } catch (err) {
+    //     this.$Message.error(err && err.desc ? err.desc : err)
     //     this.orgs = []
     //   }
     // },
@@ -243,9 +250,15 @@ export default {
       }).catch(res => this.$Message.error(res && res.desc ? res.desc : res))
     },
     // 城市机构关系
-    csjggxHandle (row) {
-      this.item = { ...row }
+    roleHandle (row) {
+      this.item = row
       this.boxShow2 = true
+    },
+    okHandle2 () {
+      this.$refs.role.handleSubmit()
+    },
+    cancelHandle2 () {
+      this.$refs.role.handleCancel()
     }
   }
 }

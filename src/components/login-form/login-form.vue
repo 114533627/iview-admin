@@ -62,7 +62,7 @@ export default {
   data () {
     return {
       form: {
-        username: 'admin',
+        username: '',
         password: '',
         code: '',
         randomStr: ''

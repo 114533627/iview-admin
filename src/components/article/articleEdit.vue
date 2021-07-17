@@ -173,8 +173,8 @@ export default {
         } else {
           this.orgs = []
         }
-      } catch (e) {
-        this.$Message.error(e)
+      } catch (err) {
+        this.$Message.error(err && err.desc ? err.desc : err)
         this.orgs = []
       }
     },
@@ -193,8 +193,8 @@ export default {
         } else {
           this.articles = []
         }
-      } catch (e) {
-        this.$Message.error(e)
+      } catch (err) {
+        this.$Message.error(err && err.desc ? err.desc : err)
         this.articles = []
       }
     },
@@ -227,7 +227,7 @@ export default {
             } else {
               this.$Message.error((this.operate === 'add' ? '添加' : '保存') + `失败 ${res.desc}`)
             }
-          } catch (e) {
+          } catch (err) {
             this.$Message.error((this.operate === 'add' ? '添加' : '保存') + `失败 ${e.desc}`)
           }
           if (this.showFooter) {

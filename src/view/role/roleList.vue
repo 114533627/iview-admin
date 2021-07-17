@@ -30,6 +30,15 @@
       @on-cancel="cancelHandle">
       <role-edit ref="edit" :item="item" :operate="operate" @editOk="editOkHandle"></role-edit>
     </Modal>
+    <Modal
+      ref="privModal"
+      v-model="boxShow2"
+      width="1000"
+      title="用户角色"
+      @on-ok="okHandle2"
+      @on-cancel="cancelHandle2">
+      <role-priv ref="priv" :item="item" @editOk="editOkHandle"></role-priv>
+    </Modal>
   </Card>
 </template>
 
@@ -37,10 +46,11 @@
 import { mapGetters } from 'vuex'
 import Operate from '../../components/common/Operate'
 import RoleEdit from '../../components/role/roleEdit'
+import RolePriv from '../../components/role/rolePriv'
 
 export default {
   name: 'RoleList',
-  components: { Operate, RoleEdit },
+  components: { Operate, RoleEdit, RolePriv },
   computed: {
   },
   data () {
@@ -48,6 +58,7 @@ export default {
       roles: [],
       operate: 'add',
       boxShow: false,
+      boxShow2: false,
       boxTitle: '添加角色',
       loading: false,
       dataList: [],
@@ -99,12 +110,13 @@ export default {
           render: (h, { row, column, index }) => {
             return h(Operate, {
               props: {
-                need: { edit: true, del: true },
+                need: { edit: true, del: true, priv: true },
                 rowData: row
               },
               on: {
                 edit: this.editHandle,
-                del: this.delHandle
+                del: this.delHandle,
+                priv: this.privHandle
               }
             })
           }
@@ -141,7 +153,7 @@ export default {
         }
       }).catch(err => {
         this.loading = false
-        this.$Message.error(err)
+        this.$Message.error(err && err.desc ? err.desc : err)
       })
     },
     addHandle () {
@@ -176,6 +188,16 @@ export default {
     editOkHandle () {
       this.boxShow = false
       this.getDataList()
+    },
+    privHandle (row) {
+      this.item = row
+      this.boxShow2 = true
+    },
+    okHandle2 () {
+      this.$refs.priv.handleSubmit()
+    },
+    cancelHandle2 () {
+      this.$refs.priv.handleCancel()
     }
   }
 }

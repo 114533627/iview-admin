@@ -183,8 +183,8 @@ export default {
         } else {
           this.areas = []
         }
-      } catch (e) {
-        this.$Message.error(e)
+      } catch (err) {
+        this.$Message.error(err && err.desc ? err.desc : err)
         this.areas = []
       }
     },

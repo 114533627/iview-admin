@@ -40,6 +40,12 @@
       <FormItem label="前端路径" prop="path">
         <Input v-model="form.path" style="width: 60%" placeholder="前端路径"></Input>
       </FormItem>
+      <FormItem label="是否隐藏" prop="hidden">
+        <Select v-model="form.hidden" clearable style="width:200px" placeholder="请选择请求方法">
+          <Option :value="0">否</Option>
+          <Option :value="1">是</Option>
+        </Select>
+      </FormItem>
       <FormItem label="备注" prop="remark">
         <Input  v-model="form.remark" style="width: 60%" placeholder="remark"></Input>
       </FormItem>
@@ -72,6 +78,7 @@ export default {
   watch: {
     item () {
       this.form = { ...this.item }
+      this.getPrivilegess()
     }
   },
   computed: {
@@ -128,16 +135,16 @@ export default {
           const list = res.data.map(item => {
             return {
               value: item.id,
-              label: item.name_zh
+              label: item.name
             }
           })
-          this.privilegess = list
+          this.privilegeses = list
         } else {
-          this.privilegess = []
+          this.privilegeses = []
         }
-      } catch (e) {
-        this.$Message.error(e)
-        this.privilegess = []
+      } catch (err) {
+        this.$Message.error(err && err.desc ? err.desc : err)
+        this.privilegeses = []
       }
     },
     handleCancel () {
@@ -162,7 +169,7 @@ export default {
             } else {
               this.$Message.error((this.operate === 'add' ? '添加' : '保存') + `失败 ${res.desc}`)
             }
-          } catch (e) {
+          } catch (err) {
             this.$Message.error((this.operate === 'add' ? '添加' : '保存') + `失败 ${e.desc}`)
           }
           if (this.showFooter) {

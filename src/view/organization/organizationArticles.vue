@@ -276,7 +276,7 @@ export default {
         }
       }).catch(err => {
         this.loading = false
-        this.$Message.error(err)
+        this.$Message.error(err && err.desc ? err.desc : err)
       })
     },
     addHandle () {
@@ -285,6 +285,10 @@ export default {
     },
     addRecommendHandle () {
       if (this.tab === 'self') {
+        if (this.selectedRows.length === 0) {
+          this.$Message.info('请先选择要添加推荐的行')
+          return
+        }
         let text = '添加推荐'
         this.$Modal.confirm({
           title: '确认',

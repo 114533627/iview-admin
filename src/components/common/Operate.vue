@@ -10,6 +10,8 @@
     <Button v-if="need.hdrl" type="default" @click="clickHandle('hdrl')">活动日历</Button>
     <Button v-if="need.csdsj" type="default" @click="clickHandle('csdsj')">大事件</Button>
     <Button v-if="need.csjggx" type="default" @click="clickHandle('csjggx')">机构关联</Button>
+    <Button v-if="need.role" type="default" @click="clickHandle('role')">角色</Button>
+    <Button v-if="need.priv" type="default" @click="clickHandle('priv')">权限</Button>
   </div>
 </template>
 
@@ -35,7 +37,9 @@ export default {
         ljgd: false,
         hdrl: false,
         csdsj: false,
-        csjggx: false
+        csjggx: false,
+        role: false,
+        priv: false
       })
     },
     rowData: Object

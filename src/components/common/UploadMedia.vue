@@ -103,7 +103,7 @@ export default {
         this.$refs[this.uploadRef].fileList.splice(fileList.indexOf(file), 1)
         this.selfDefaultList = this.selfDefaultList.filter(item => item.url !== file.url)
         this.$emit('uploadOver', this.selfDefaultList)
-      } catch (e) {
+      } catch (err) {
         this.$Message.error(e.desc)
       }
     },

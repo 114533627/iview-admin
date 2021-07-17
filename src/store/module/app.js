@@ -9,7 +9,8 @@ import {
   routeEqual,
   getRouteTitleHandled,
   localSave,
-  localRead
+  localRead,
+  formatRoutes
 } from '@/libs/util'
 import { saveErrorLogger, getSysEnums, getOrganizationList } from '@/api/data'
 import router from '@/router'
@@ -36,7 +37,7 @@ export default {
     sysEnums: localRead('sysEnums') ? JSON.parse(localRead('sysEnums')) : {}
   },
   getters: {
-    menuList: (state, getters, rootState) => getMenuByRouter(routers, rootState.user.access),
+    menuList: (state, getters, rootState) => getMenuByRouter(formatRoutes(getters.privilegesList), rootState.user.access),
     errorCount: state => state.errorList.length,
     sysEnums: state => state.sysEnums,
     getEnumsByName: state => (enumName) => {

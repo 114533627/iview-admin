@@ -132,8 +132,8 @@ export default {
         } else {
           this.areas = []
         }
-      } catch (e) {
-        this.$Message.error(e)
+      } catch (err) {
+        this.$Message.error(err && err.desc ? err.desc : err)
         this.areas = []
       }
     },
@@ -159,7 +159,7 @@ export default {
             } else {
               this.$Message.error((this.operate === 'add' ? '添加' : '保存') + `失败 ${res.desc}`)
             }
-          } catch (e) {
+          } catch (err) {
             this.$Message.error((this.operate === 'add' ? '添加' : '保存') + `失败 ${e.desc}`)
           }
           if (this.showFooter) {

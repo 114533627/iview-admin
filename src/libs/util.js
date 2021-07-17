@@ -6,6 +6,7 @@ import config from '@/config'
 import { forEach, hasOneOf, objEqual } from '@/libs/tools'
 const { title, cookieExpires, useI18n } = config
 
+export const removeFromStorage = removeStorage
 /**
  * 加密处理
  */
@@ -38,6 +39,60 @@ export const encryption = (params) => {
   }
   return result
 }
+/**
+ * 格式化菜单
+ * @param aMenu
+ * @returns {[]}
+ */
+function setChildren (root, list) {
+  let children = []
+  root.children = children
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].type === 'menu' && list[i].parent_id === root.id) {
+      setChildren(list[i], list)
+      children.push(list[i])
+    }
+  }
+}
+
+export const formatRoutes = (privilegesList) => {
+  // 首先这个列表进行树组结构组织
+  if (!privilegesList || privilegesList.length === 0) return []
+  let roots = privilegesList.filter(item => item.type === 'menu')
+  roots.forEach(item => setChildren(item, privilegesList))
+
+  const aRouter = []
+  roots.forEach(oMenu => {
+    const {
+      path,
+      component,
+      code,
+      name,
+      icon,
+      children,
+      hidden
+    } = oMenu
+    if (component) {
+      const oRouter = {
+        path: path,
+        component: (resolve) => {
+          let comp = require([`${'@/../' + component}`], resolve)
+          console.log(comp)
+          return comp
+        },
+        name: code,
+        meta: {
+          hideInMenu: !!hidden,
+          icon: icon,
+          title: name
+        },
+        children: !children || children.length === 0 ? [] : formatRoutes(children)
+      }
+      aRouter.push(oRouter)
+    }
+  })
+  return aRouter
+}
 
 export const TOKEN_KEY = 'token'
 
@@ -60,10 +115,6 @@ export const setRefreshToken = (token) => {
   return setStorage({ name: 'refresh_token', content: token, type: 'string' })
 }
 
-export const removeRefreshToken = () => {
-  return removeStorage({ name: 'refresh_token' })
-}
-
 export const hasChild = (item) => {
   return item.children && item.children.length !== 0
 }
@@ -79,13 +130,14 @@ const showThisMenuEle = (item, access) => {
  * @returns {Array}
  */
 export const getMenuByRouter = (list, access) => {
+  console.log(list)
   let res = []
   forEach(list, item => {
     if (!item.meta || (item.meta && !item.meta.hideInMenu)) {
       let obj = {
-        icon: (item.meta && item.meta.icon) || '',
+        icon: item.icon || (item.meta && item.meta.icon) || '',
         name: item.name,
-        meta: item.meta
+        meta: item.meta || { title: item.name, icon: item.icon }
       }
       if ((hasChild(item) || (item.meta && item.meta.showAlways)) && showThisMenuEle(item, access)) {
         obj.children = getMenuByRouter(item.children, access)
@@ -94,6 +146,7 @@ export const getMenuByRouter = (list, access) => {
       if (showThisMenuEle(item, access)) res.push(obj)
     }
   })
+  console.log(res)
   return res
 }
 

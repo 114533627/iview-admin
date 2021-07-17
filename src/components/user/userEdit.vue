@@ -30,6 +30,11 @@
       <FormItem label="确认密码" prop="repassword">
         <Input type="password" v-model="form.repassword" style="width: 60%" placeholder="确认密码"></Input>
       </FormItem>
+      <FormItem label="管理区域" prop="area_id">
+        <Select v-model="form.area_id" clearable style="width:200px" placeholder="请选择管理的区域">
+          <Option v-for="{value,label} in areas" :value="value" :key="value">{{label}}</Option>
+        </Select>
+      </FormItem>
       <FormItem v-show="showFooter">
         <Button type="primary" @click="handleCancel('form')">取消</Button>
         <Button @click="handleSubmit('form')" style="margin-left: 8px">确定</Button>
@@ -59,6 +64,7 @@ export default {
   watch: {
     item () {
       this.form = { ...this.item }
+      this.getAreas()
     }
   },
   computed: {
@@ -69,7 +75,7 @@ export default {
   },
   async created () {
     this.form = { ...this.item }
-    this.getUsers()
+    this.getAreas()
   },
   mounted () {
   },
@@ -78,13 +84,21 @@ export default {
   data () {
     return {
       datatimeRange: [],
-      users: [],
+      areas: [],
       form: {},
       rules: {
         // type: [{ type: 'number', required: true, message: '请选择用户类型', trigger: 'change' }],
         // img_url: [{ type: 'string', required: true, message: '请上传图片', trigger: 'blur' }],
         // name_zh: [{ required: true, message: '请输入标题', trigger: 'blur' }, { type: 'string', max: 50, message: '长度不超过50个字符', trigger: 'blur' }],
-        // name_en: [{ required: true, message: '请输入标题', trigger: 'blur' }, { type: 'string', max: 50, message: '长度不超过50个字符', trigger: 'blur' }]
+        repassword: [{ type: 'string',
+          validator: (rule, value, callback) => {
+            if (this.form.password && this.form.password !== value) {
+              callback(new Error('两次密码不一致'))
+            } else {
+              callback()
+            }
+          },
+          trigger: 'blur' }]
       }
     }
   },
@@ -103,11 +117,11 @@ export default {
     //   }
     //   return id
     // },
-    async getUsers () {
+    async getAreas () {
       try {
+        // 查询区域列表
         let param = { page: 1, limit: 1000 }
-        console.log(param)
-        let res = await this.$api.getUserList(param)
+        let res = await this.$api.getAreaList(param)
         if (res.code === 200) {
           const list = res.data.map(item => {
             return {
@@ -115,13 +129,13 @@ export default {
               label: item.name_zh
             }
           })
-          this.users = list
+          this.areas = list
         } else {
-          this.users = []
+          this.areas = []
         }
-      } catch (e) {
-        this.$Message.error(e)
-        this.users = []
+      } catch (err) {
+        this.$Message.error(err && err.desc ? err.desc : err)
+        this.areas = []
       }
     },
     handleCancel () {
@@ -146,7 +160,7 @@ export default {
             } else {
               this.$Message.error((this.operate === 'add' ? '添加' : '保存') + `失败 ${res.desc}`)
             }
-          } catch (e) {
+          } catch (err) {
             this.$Message.error((this.operate === 'add' ? '添加' : '保存') + `失败 ${e.desc}`)
           }
           if (this.showFooter) {

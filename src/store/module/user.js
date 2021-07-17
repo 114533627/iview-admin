@@ -9,7 +9,7 @@ import {
   restoreTrash,
   getUnreadCount
 } from '@/api/user'
-import { setToken, getToken, encryption, getRefreshToken, setRefreshToken } from '@/libs/util'
+import { setToken, getToken, encryption, getRefreshToken, setRefreshToken, removeFromStorage } from '@/libs/util'
 
 export default {
   state: {
@@ -24,7 +24,8 @@ export default {
     messageUnreadList: [],
     messageReadedList: [],
     messageTrashList: [],
-    messageContentStore: {}
+    messageContentStore: {},
+    privilegesList: [] // 用来存后端接口按用户权限控制的用户权限列表
   },
   mutations: {
     setAvatar (state, avatarPath) {
@@ -46,6 +47,9 @@ export default {
     setRefreshToken (state, refresh_token) {
       state.refresh_token = refresh_token
       setRefreshToken(refresh_token)
+    },
+    setPrivilegesList (state, privilegesList) {
+      state.privilegesList = privilegesList
     },
     setHasGetInfo (state, status) {
       state.hasGetInfo = status
@@ -77,7 +81,8 @@ export default {
     messageReadedCount: state => state.messageReadedList.length,
     messageTrashCount: state => state.messageTrashList.length,
     token: state => state.token,
-    refresh_token: state => state.refresh_token
+    refresh_token: state => state.refresh_token,
+    privilegesList: state => state.privilegesList
   },
   actions: {
     // 登录
@@ -105,6 +110,7 @@ export default {
           commit('setToken', '')
           commit('setRefreshToken', '')
           commit('setAccess', [])
+          removeFromStorage({ name: 'tagNaveList' })
           resolve()
         }).catch(err => {
           reject(err)
@@ -126,6 +132,7 @@ export default {
             commit('setUserId', data.id)
             commit('setAccess', 'home')
             commit('setHasGetInfo', true)
+            commit('setPrivilegesList', data.privs)
             resolve(data)
           }).catch(err => {
             reject(err)

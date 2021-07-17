@@ -346,3 +346,19 @@ export const delPrivileges = ({ id }) => {
     params: { id }
   })
 }
+// 保存用户角色
+export const saveUserRole = (params) => {
+  return axios.request({
+    url: '/v1/admin/user_role',
+    method: 'put',
+    data: params
+  })
+}
+// 保存角色权限
+export const saveRolePrivileges = (params) => {
+  return axios.request({
+    url: '/v1/admin/role_privileges',
+    method: 'put',
+    data: params
+  })
+}

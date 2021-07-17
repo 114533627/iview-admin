@@ -210,7 +210,7 @@ export default {
         }
       }).catch(err => {
         this.loading = false
-        this.$Message.error(err)
+        this.$Message.error(err && err.desc ? err.desc : err)
       })
     },
     // async getOrgs () {
@@ -229,8 +229,8 @@ export default {
     //     } else {
     //       this.orgs = []
     //     }
-    //   } catch (e) {
-    //     this.$Message.error(e)
+    //   } catch (err) {
+    //     this.$Message.error(err && err.desc ? err.desc : err)
     //     this.orgs = []
     //   }
     // },

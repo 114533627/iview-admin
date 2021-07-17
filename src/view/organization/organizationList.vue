@@ -202,7 +202,7 @@ export default {
         }
       }).catch(err => {
         this.loading = false
-        this.$Message.error(err)
+        this.$Message.error(err && err.desc ? err.desc : err)
       })
     },
     addHandle () {

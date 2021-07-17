@@ -79,56 +79,87 @@ export default {
           key: 'id'
         },
         {
-          title: '姓名',
+          title: '名称',
           width: 120,
           key: 'name'
         },
         {
-          title: '权限名',
+          title: '标识',
           width: 120,
-          key: 'privilegesname'
+          key: 'code'
         },
         {
-          title: '性别',
-          width: 80,
-          key: 'gender',
+          title: '权限类型',
+          width: 120,
+          key: 'type',
           render: (h, { row, column, index }) => {
             return h('span', {
               domProps: {
-                innerHTML: (row.gender === 'woman') ? '女' : '男'
+                innerHTML: this.getEnumLabelByValue('PrivilegesType', row.type)
               }
             })
           }
         },
         {
-          title: '电话',
-          width: 80,
-          key: 'phone'
+          title: '父级ID',
+          width: 60,
+          key: 'parent_id'
         },
         {
-          title: '头像',
+          title: '图标',
           width: 80,
           align: 'center',
-          key: 'avatar',
+          key: 'icon',
           render: (h, { row, column, index }) => {
-            return h('img', {
+            return h('Icon', {
               attrs: {
-                src: row.avatar
+                type: row.icon
               },
               'class': 'list-img'
             })
           }
         },
         {
-          title: 'email',
+          title: 'uri',
           width: 120,
-          key: 'email'
+          key: 'uri'
         },
         {
-          title: '区域ID',
+          title: '请求方法',
+          width: 60,
+          key: 'method'
+        },
+        {
+          title: '排序',
+          width: 50,
+          key: 'sort'
+        },
+        {
+          title: '前端组件',
           width: 80,
-          align: 'center',
-          key: 'area_id'
+          key: 'component'
+        },
+        {
+          title: '前端路径',
+          width: 120,
+          key: 'path'
+        },
+        {
+          title: '隐藏',
+          width: 80,
+          key: 'hidden',
+          render: (h, { row, column, index }) => {
+            return h('span', {
+              domProps: {
+                innerHTML: row.hidden ? '是' : '否'
+              }
+            })
+          }
+        },
+        {
+          title: '备注',
+          width: 120,
+          key: 'remark'
         },
         {
           title: '操作',
@@ -178,7 +209,7 @@ export default {
         }
       }).catch(err => {
         this.loading = false
-        this.$Message.error(err)
+        this.$Message.error(err && err.desc ? err.desc : err)
       })
     },
     // async getOrgs () {
@@ -197,8 +228,8 @@ export default {
     //     } else {
     //       this.orgs = []
     //     }
-    //   } catch (e) {
-    //     this.$Message.error(e)
+    //   } catch (err) {
+    //     this.$Message.error(err && err.desc ? err.desc : err)
     //     this.orgs = []
     //   }
     // },
@@ -231,21 +262,6 @@ export default {
     editOkHandle () {
       this.boxShow = false
       this.getDataList()
-    },
-    statusHandle (row) {
-      this.$api.updatePrivilegesStatus({ id: row.id, status: row.status === 0 ? 1 : 0 }).then(res => {
-        if (res.code === 200) {
-          this.$Message.success('操作成功')
-          this.getDataList()
-        } else {
-          this.$Message.error(res.desc)
-        }
-      }).catch(res => this.$Message.error(res && res.desc ? res.desc : res))
-    },
-    // 城市机构关系
-    csjggxHandle (row) {
-      this.item = { ...row }
-      this.boxShow2 = true
     }
   }
 }

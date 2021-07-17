@@ -1,8 +1,8 @@
 <template>
   <div>
     <Form ref="form" :model="form" :rules="rules" :label-width="80">
-      <FormItem label="用户ID" prop="id" >
-        <Input v-model="form.id" disabled style="width: 60%" placeholder="用户ID"></Input>
+      <FormItem label="角色ID" prop="id" >
+        <Input v-model="form.id" disabled style="width: 60%" placeholder="角色ID"></Input>
       </FormItem>
       <FormItem label="名称" prop="name">
         <Input v-model="form.name" style="width: 60%" placeholder="名称"></Input>
@@ -61,7 +61,7 @@ export default {
       datatimeRange: [],
       form: {},
       rules: {
-        // type: [{ type: 'number', required: true, message: '请选择用户类型', trigger: 'change' }],
+        // type: [{ type: 'number', required: true, message: '请选择角色类型', trigger: 'change' }],
         // img_url: [{ type: 'string', required: true, message: '请上传图片', trigger: 'blur' }],
         // name_zh: [{ required: true, message: '请输入标题', trigger: 'blur' }, { type: 'string', max: 50, message: '长度不超过50个字符', trigger: 'blur' }],
         // name_en: [{ required: true, message: '请输入标题', trigger: 'blur' }, { type: 'string', max: 50, message: '长度不超过50个字符', trigger: 'blur' }]
@@ -82,9 +82,9 @@ export default {
           try {
             let res = null
             if (this.operate === 'add') {
-              res = await this.$api.addUser(this.form)
+              res = await this.$api.addRole(this.form)
             } else {
-              res = await this.$api.updateUser(this.form)
+              res = await this.$api.updateRole(this.form)
             }
             console.log(res)
             if (res != null && res.code === 200) {
@@ -92,7 +92,7 @@ export default {
             } else {
               this.$Message.error((this.operate === 'add' ? '添加' : '保存') + `失败 ${res.desc}`)
             }
-          } catch (e) {
+          } catch (err) {
             this.$Message.error((this.operate === 'add' ? '添加' : '保存') + `失败 ${e.desc}`)
           }
           if (this.showFooter) {
