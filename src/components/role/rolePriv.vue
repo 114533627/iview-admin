@@ -89,7 +89,7 @@ export default {
         let res = await this.$api.getPrivilegesList(param)
         if (res.code === 200) {
           let list = res.data
-          console.log(list)
+
           // 组织成树
           this.roots = list.filter(item => item.parent_id === 0).map(item => {
             let obj = { ...item }

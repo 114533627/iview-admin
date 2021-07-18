@@ -194,6 +194,44 @@ export default [
         component: () => import('@/view/article/articleList.vue')
       }
     ]
+  },
+  {
+    path: '/navigation',
+    name: 'navigation',
+    component: Main,
+    meta: {
+      hideInBread: true
+    },
+    children: [
+      {
+        path: 'list',
+        name: 'navigationList',
+        meta: {
+          icon: '_qq',
+          title: '导航管理'
+        },
+        component: () => import('@/view/navigation/navigationList.vue')
+      }
+    ]
+  },
+  {
+    path: '/sys_config',
+    name: 'sys_config',
+    component: Main,
+    meta: {
+      hideInBread: true
+    },
+    children: [
+      {
+        path: 'list',
+        name: 'sysConfigList',
+        meta: {
+          icon: '_qq',
+          title: '配置管理'
+        },
+        component: () => import('@/view/sys-config/sysConfigList.vue')
+      }
+    ]
   }
   // {
   //   path: '/message',

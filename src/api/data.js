@@ -362,3 +362,67 @@ export const saveRolePrivileges = (params) => {
     data: params
   })
 }
+// 获取权限列表
+export const getNavigationList = (params) => {
+  return axios.request({
+    url: '/v1/admin/navigation',
+    method: 'get',
+    params: params
+  })
+}
+// 添加权限信息
+export const addNavigation = (params) => {
+  return axios.request({
+    url: '/v1/admin/navigation',
+    method: 'post',
+    data: params
+  })
+}
+// 修改权限信息
+export const updateNavigation = (params) => {
+  return axios.request({
+    url: '/v1/admin/navigation',
+    method: 'put',
+    data: params
+  })
+}
+// 删除用户信息
+export const delNavigation = ({ id }) => {
+  return axios.request({
+    url: '/v1/admin/navigation',
+    method: 'delete',
+    params: { id }
+  })
+}
+// 获取权限列表
+export const getSysConfigList = (params) => {
+  return axios.request({
+    url: '/v1/admin/sys_config',
+    method: 'get',
+    params: params
+  })
+}
+// 添加权限信息
+export const addSysConfig = (params) => {
+  return axios.request({
+    url: '/v1/admin/sys_config',
+    method: 'post',
+    data: params
+  })
+}
+// 修改权限信息
+export const updateSysConfig = (params) => {
+  return axios.request({
+    url: '/v1/admin/sys_config',
+    method: 'put',
+    data: params
+  })
+}
+// 删除用户信息
+export const delSysConfig = ({ id }) => {
+  return axios.request({
+    url: '/v1/admin/sys_config',
+    method: 'delete',
+    params: { id }
+  })
+}
