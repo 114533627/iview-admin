@@ -23,7 +23,7 @@
         <Input v-model="form.name" style="width: 60%" placeholder="名称"></Input>
       </FormItem>
       <FormItem label="url" prop="url">
-        <Input v-model="form.uri" style="width: 60%" placeholder="url"></Input>
+        <Input v-model="form.url" style="width: 60%" placeholder="url"></Input>
       </FormItem>
       <FormItem label="级别" prop="level">
         <Input v-model="form.level" style="width: 60%" placeholder="级别 填1 或 2"></Input>
