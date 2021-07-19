@@ -150,6 +150,11 @@ export default {
           key: 'to_id'
         },
         {
+          title: '标签',
+          width: 80,
+          key: 'org_tag'
+        },
+        {
           title: '操作',
           width: 330,
           render: (h, { row, column, index }) => {

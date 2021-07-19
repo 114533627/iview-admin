@@ -35,6 +35,13 @@
           <Option v-for="item in orgTypeEnums" :value="item.value" :key="item.value">{{ item.label }}</Option>
         </Select>
       </FormItem>
+      <FormItem v-if="form.type === 'org'" label="机构标签" prop="org_tag">
+        <RadioGroup v-model="form.org_tag">
+          <Radio label="教育"></Radio>
+          <Radio label="实验实"></Radio>
+          <Radio label="企业"></Radio>
+        </RadioGroup>
+      </FormItem>
       <FormItem label="logo" prop="logo">
         <upload-media :max="1" :upload-param="{tableName: 'organization',targetId: ''}"
                       :default-list="form.logo ? [{url: form.logo}] : []"
