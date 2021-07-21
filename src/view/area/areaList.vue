@@ -71,9 +71,7 @@ export default {
         show: true,
         text: '启用'
       },
-      orgs: [],
-      articleType: '',
-      targetId: 0,
+      areas: [],
       boxShow2: false,
       operate: 'add',
       boxShow: false,
@@ -94,6 +92,26 @@ export default {
           title: 'ID',
           width: 60,
           key: 'id'
+        },
+        {
+          title: '父级',
+          width: 120,
+          key: 'parent_id',
+          render: (h, { row, column, index }) => {
+            return h('span',
+              {
+                domProps: {
+                  innerHTML: (({ parent_id }) => {
+                    if (!parent_id) return ''
+                    for (let i = 0; i < this.areas.length; i++) {
+                      if (this.areas[i].value === parent_id) return this.areas[i].label
+                    }
+                    return parent_id
+                  })(row)
+                }
+              }
+            )
+          }
         },
         {
           title: '中文名称',
@@ -182,7 +200,8 @@ export default {
     }
   },
   async created () {
-    this.getDataList()
+    await this.getAreas()
+    await this.getDataList()
   },
   mounted () {
     this.$refs.editModal.ok = () => {
@@ -199,10 +218,10 @@ export default {
       this.page_info.page = 1
       this.getDataList()
     },
-    getDataList () {
+    async getDataList () {
       this.loading = true
       let params = { ...this.searchParams, ...this.page_info }
-      this.$api.getAreaList(params).then(res => {
+      await this.$api.getAreaList(params).then(res => {
         this.loading = false
         if (res.code === 200) {
           this.dataList = res.data
@@ -213,27 +232,26 @@ export default {
         this.$Message.error(err && err.desc ? err.desc : err)
       })
     },
-    // async getOrgs () {
-    //   try {
-    //     let param = { page: 1, limit: 1000 }
-    //     console.log(param)
-    //     let res = await this.$api.getOrganizationList(param)
-    //     if (res.code === 200) {
-    //       const list = res.data.map(item => {
-    //         return {
-    //           value: item.id,
-    //           label: item.name
-    //         }
-    //       })
-    //       this.orgs = list
-    //     } else {
-    //       this.orgs = []
-    //     }
-    //   } catch (err) {
-    //     this.$Message.error(err && err.desc ? err.desc : err)
-    //     this.orgs = []
-    //   }
-    // },
+    async getAreas () {
+      try {
+        let param = { page: 1, limit: 1000 }
+        let res = await this.$api.getAreaList(param)
+        if (res.code === 200) {
+          const list = res.data.map(item => {
+            return {
+              value: item.id,
+              label: item.name_zh
+            }
+          })
+          this.areas = list
+        } else {
+          this.areas = []
+        }
+      } catch (err) {
+        this.$Message.error(err && err.desc ? err.desc : err)
+        this.areas = []
+      }
+    },
     addHandle () {
       this.item = {}
       this.edit('添加区域信息', 'add')

@@ -149,13 +149,13 @@ export default {
   },
   watch: {
     async item () {
-      await this.getDataList()
       await this.getAreas()
+      await this.getDataList()
     }
   },
   async created () {
-    await this.getDataList()
     await this.getAreas()
+    await this.getDataList()
   },
   mounted () {
   },
@@ -176,7 +176,7 @@ export default {
         if (this.dataList.length) {
           param.exclude = this.dataList.map(item => item.id).join(',')
         }
-        console.log(param)
+
         let res = await this.$api.getAreaList(param)
         if (res.code === 200) {
           const list = res.data.map(item => {

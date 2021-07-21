@@ -222,7 +222,7 @@ export default {
     async getOrgs () {
       try {
         let param = { page: 1, limit: 1000 }
-        console.log(param)
+
         let res = await this.$api.getOrganizationList(param)
         if (res.code === 200) {
           const list = res.data.map(item => {

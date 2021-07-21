@@ -69,6 +69,7 @@ export default {
   watch: {
     item () {
       this.form = { ...this.item }
+      this.getAreas()
     }
   },
   computed: {
@@ -119,7 +120,7 @@ export default {
     async getAreas () {
       try {
         let param = { page: 1, limit: 1000 }
-        console.log(param)
+
         let res = await this.$api.getAreaList(param)
         if (res.code === 200) {
           const list = res.data.map(item => {
@@ -127,7 +128,7 @@ export default {
               value: item.id,
               label: item.name_zh
             }
-          })
+          }).filter(item => item.value !== this.form.id)
           this.areas = list
         } else {
           this.areas = []

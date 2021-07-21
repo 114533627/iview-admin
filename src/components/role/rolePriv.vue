@@ -85,7 +85,7 @@ export default {
     async getPrivs () {
       try {
         let param = { page: 1, limit: 10000 }
-        console.log(param)
+
         let res = await this.$api.getPrivilegesList(param)
         if (res.code === 200) {
           let list = res.data

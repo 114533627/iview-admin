@@ -62,7 +62,7 @@ export default {
     async getRoles () {
       try {
         let param = { page: 1, limit: 1000 }
-        console.log(param)
+
         let res = await this.$api.getRoleList(param)
         if (res.code === 200) {
           const list = res.data.map(item => {

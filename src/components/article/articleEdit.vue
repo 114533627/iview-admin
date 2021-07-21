@@ -159,7 +159,7 @@ export default {
         let param = { page: 1, limit: 1000 }
         if (this.item.org_id) param.id = this.item.org_id
         else param.lang = this.form.lang === 'zh' ? 'zh' : 'en'
-        console.log(param)
+
         let res = await this.$api.getOrganizationList(param)
         if (res.code === 200) {
           const list = res.data.map(item => {
