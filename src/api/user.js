@@ -30,7 +30,7 @@ export const logout = (token) => {
 
 export const getUnreadCount = () => {
   return axios.request({
-    url: 'message/count',
+    url: '/v1/message/count',
     method: 'get'
   })
 }

@@ -7,9 +7,12 @@
       <FormItem label="角色名称" name="name">
         <Input v-model="form.name" style="width: 60%" disabled placeholder="角色名称"></Input>
       </FormItem>
-      <FormItem label="权限">
-        <treeselect v-model="privIds" :autoSelectAncestors="true"
-                    :autoSelectDescendants="true"  :autoDeselectDescendants="true" :flat="true" :multiple="true" :options="roots" />
+<!--      <FormItem label="权限">-->
+<!--        <treeselect v-model="privIds" :autoSelectAncestors="true"-->
+<!--                    :autoSelectDescendants="true"  :autoDeselectDescendants="true" :flat="true" :multiple="true" :options="roots" />-->
+<!--      </FormItem>-->
+      <FormItem>
+        <Tree :data="roots" show-checkbox multiple :check-strictly="true" @on-check-change="checkChangeHandle"></Tree>
       </FormItem>
       <FormItem v-show="showFooter">
         <Button type="primary" @click="handleCancel('form')">取消</Button>
@@ -21,11 +24,11 @@
 </template>
 
 <script>
-import Treeselect from '@riophae/vue-treeselect'
-import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+// import Treeselect from '@riophae/vue-treeselect'
+// import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
   name: 'RolePrivileges',
-  components: { Treeselect },
+  components: { /*Treeselect */},
   props: {
     item: {
       type: Object
@@ -37,6 +40,7 @@ export default {
   },
   watch: {
     item () {
+      this.roots = []
       this.form = { ...this.item }
       this.privIds = this.item && this.item.privileges_list ? this.item.privileges_list.map(item => item.id) : []
       this.getPrivs()
@@ -59,6 +63,7 @@ export default {
       rules: {
       },
       privIds: [],
+      roots2: [],
       // define options
       roots: [
       //   {
@@ -90,10 +95,15 @@ export default {
         if (res.code === 200) {
           let list = res.data
 
+          list.forEach(item => {
+            if (this.privIds.includes(item.id)) item.checked = true
+          })
+
           // 组织成树
           this.roots = list.filter(item => item.parent_id === 0).map(item => {
             let obj = { ...item }
             obj.label = obj.name
+            obj.title = obj.name
             return obj
           })
           for (let i = 0; i < this.roots.length; i++) {
@@ -112,12 +122,16 @@ export default {
       let children = []
       root.children = children
       root.label = root.name
+      root.title = root.name
       for (let i = 0; i < list.length; i++) {
         if (list[i].parent_id === root.id) {
           this.setChildren(list[i], list)
           children.push(list[i])
         }
       }
+    },
+    checkChangeHandle (nodes) {
+      this.privIds = nodes.map(item => item.id)
     },
     handleCancel () {
       console.log('cancel edit')

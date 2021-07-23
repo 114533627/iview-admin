@@ -256,8 +256,10 @@ export const getNewTagList = (list, newRoute) => {
  * @param {*} route 路由列表
  */
 const hasAccess = (access, route) => {
-  if (route.meta && route.meta.access) return hasOneOf(access, route.meta.access)
-  else return true
+  // if (route.meta && route.meta.access) return hasOneOf(access, route.meta.access)
+  // else return true
+  if (['home', 'error_404', 'error_500', 'error_401'].includes(route.name)) return true
+  return access.some(item => route.name === item.code)
 }
 
 /**

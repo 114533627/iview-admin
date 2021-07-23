@@ -28,7 +28,7 @@
       :multiple="max>1"
       :data="uploadParam"
       :headers="headers"
-      :disabled="uploadList.length>=max"
+      :disabled="selfDefaultList.length>=max"
       type="drag"
       :action="actionUrl"
       style="display: inline-block;width:58px;">

@@ -147,7 +147,7 @@ export default {
       getUnreadCount().then(res => {
         const { data } = res
         commit('setMessageCount', data)
-      })
+      }).catch(err => console.log(err))
     },
     // 获取消息列表，其中包含未读、已读、回收站三个列表
     getMessageList ({ state, commit }) {
