@@ -1,5 +1,5 @@
 import Main from '@/components/main'
-import parentView from '@/components/parent-view'
+// import parentView from '@/components/parent-view'
 
 /**
  * iview-admin中meta除了原生参数外可配置的参数:
@@ -232,8 +232,7 @@ export default [
         component: () => import('@/view/sys-config/sysConfigList.vue')
       }
     ]
-  }
-  // {
+  }, // {
   //   path: '/message',
   //   name: 'message',
   //   component: Main,
@@ -618,7 +617,7 @@ export default [
   //     }
   //   ]
   // },
-  ,
+
   {
     path: '/401',
     name: 'error_401',
