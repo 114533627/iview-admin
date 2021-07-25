@@ -38,7 +38,7 @@
       <FormItem v-if="form.type === 'org'" label="机构标签" prop="org_tag">
         <RadioGroup v-model="form.org_tag">
           <Radio label="教育"></Radio>
-          <Radio label="实验实"></Radio>
+          <Radio label="实验室"></Radio>
           <Radio label="企业"></Radio>
         </RadioGroup>
       </FormItem>
