@@ -44,7 +44,7 @@ router.beforeEach((to, from, next) => {
         // 拉取用户信息，通过用户权限和跳转的页面的name来判断是否有权限访问;access必须是一个数组，如：['super_admin'] ['super_admin', 'admin']
         turnTo(to, user.access, next)
       }).catch(() => {
-        debugger
+        // debugger
         setToken('')
         next({
           name: 'login'

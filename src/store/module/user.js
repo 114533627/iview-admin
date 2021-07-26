@@ -7,7 +7,8 @@ import {
   hasRead,
   removeReaded,
   restoreTrash,
-  getUnreadCount
+  getUnreadCount,
+  refreshToken
 } from '@/api/user'
 import { setToken, getToken, encryption, getRefreshToken, setRefreshToken, removeFromStorage } from '@/libs/util'
 
@@ -103,6 +104,24 @@ export default {
         })
       })
     },
+    handleRefreshToken ({ state, commit }) {
+      return new Promise((resolve, reject) => {
+        refreshToken(getRefreshToken()).then(res => {
+          // console.log(res)
+          // debugger
+          if (res.code === 200) {
+            commit('setToken', res.access_token)
+            commit('setRefreshToken', res.refresh_token)
+            resolve()
+          } else {
+            reject(res)
+          }
+        }).catch(err => {
+          // debugger
+          reject(err)
+        })
+      })
+    },
     // 退出登录
     handleLogOut ({ state, commit }) {
       return new Promise((resolve, reject) => {
@@ -113,7 +132,11 @@ export default {
           removeFromStorage({ name: 'tagNaveList' })
           resolve()
         }).catch(err => {
-          reject(err)
+          // reject(err)
+          commit('setToken', '')
+          commit('setRefreshToken', '')
+          commit('setAccess', [])
+          removeFromStorage({ name: 'tagNaveList' })
         })
         // 如果你的退出登录无需请求接口，则可以直接使用下面三行代码而无需使用logout调用接口
         // commit('setToken', '')

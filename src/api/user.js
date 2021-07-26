@@ -13,6 +13,19 @@ export const login = ({ username, password, code, randomStr }) => {
     params: { username, password, code, randomStr, grant_type: grantType, scope }
   })
 }
+export const refreshToken = (refreshToken) => {
+  //  grant_type为refresh_token
+  const grantType = 'refresh_token'
+  const scope = 'read'
+  return axios.request({
+    url: '/oauth/token',
+    headers: {
+      'Authorization': basicAuthorization
+    },
+    method: 'post',
+    params: { grant_type: grantType, scope, refresh_token: refreshToken }
+  })
+}
 
 export const getUserInfo = (token) => {
   return axios.request({
