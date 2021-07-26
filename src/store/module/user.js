@@ -107,16 +107,12 @@ export default {
     handleRefreshToken ({ state, commit }) {
       return new Promise((resolve, reject) => {
         refreshToken(getRefreshToken()).then(res => {
-          // console.log(res)
+          console.log(res)
           // debugger
-          if (res.code === 200) {
-            commit('setToken', res.access_token)
-            commit('setRefreshToken', res.refresh_token)
-            resolve()
-          } else {
-            reject(res)
-          }
+          commit('setToken', res.access_token)
+          commit('setRefreshToken', res.refresh_token)
         }).catch(err => {
+          console.log(err)
           // debugger
           reject(err)
         })
