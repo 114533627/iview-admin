@@ -215,6 +215,25 @@ export default [
     ]
   },
   {
+    path: '/message',
+    name: 'message',
+    component: Main,
+    meta: {
+      hideInBread: true
+    },
+    children: [
+      {
+        path: 'list',
+        name: 'messageList',
+        meta: {
+          icon: '_qq',
+          title: '消息管理'
+        },
+        component: () => import('@/view/message/messageList.vue')
+      }
+    ]
+  },
+  {
     path: '/sys_config',
     name: 'sys_config',
     component: Main,

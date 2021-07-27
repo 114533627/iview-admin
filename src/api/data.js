@@ -394,7 +394,7 @@ export const delNavigation = ({ id }) => {
     params: { id }
   })
 }
-// 获取权限列表
+// 获取配置列表
 export const getSysConfigList = (params) => {
   return axios.request({
     url: '/v1/admin/sys_config',
@@ -402,7 +402,7 @@ export const getSysConfigList = (params) => {
     params: params
   })
 }
-// 添加权限信息
+// 添加配置信息
 export const addSysConfig = (params) => {
   return axios.request({
     url: '/v1/admin/sys_config',
@@ -410,7 +410,7 @@ export const addSysConfig = (params) => {
     data: params
   })
 }
-// 修改权限信息
+// 修改配置信息
 export const updateSysConfig = (params) => {
   return axios.request({
     url: '/v1/admin/sys_config',
@@ -418,10 +418,42 @@ export const updateSysConfig = (params) => {
     data: params
   })
 }
-// 删除用户信息
+// 删除配置信息
 export const delSysConfig = ({ id }) => {
   return axios.request({
     url: '/v1/admin/sys_config',
+    method: 'delete',
+    params: { id }
+  })
+}
+// 获取消息列表
+export const getMessageList = (params) => {
+  return axios.request({
+    url: '/v1/admin/message',
+    method: 'get',
+    params: params
+  })
+}
+// 查看消息详情
+export const getMessage = ({ id }) => {
+  return axios.request({
+    url: '/v1/admin/message/' + id,
+    method: 'get',
+    data: params
+  })
+}
+// 回复消息信息
+export const addMessage = (params) => {
+  return axios.request({
+    url: '/v1/admin/message',
+    method: 'post',
+    data: params
+  })
+}
+// 删除消息信息
+export const delMessage = ({ id }) => {
+  return axios.request({
+    url: '/v1/admin/message',
     method: 'delete',
     params: { id }
   })
