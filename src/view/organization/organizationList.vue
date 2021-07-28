@@ -113,6 +113,18 @@ export default {
           }
         },
         {
+          title: '状态',
+          width: 80,
+          key: 'status',
+          render: (h, { row, column, index }) => {
+            return h('span', {
+              domProps: {
+                innerHTML: row.status ? '资料上传中' : '正常'
+              }
+            })
+          }
+        },
+        {
           title: '语言',
           width: 80,
           key: 'lang',

@@ -42,6 +42,12 @@
           <Radio label="企业"></Radio>
         </RadioGroup>
       </FormItem>
+      <FormItem label="机构状态" prop="status">
+        <Select v-model="form.status" clearable style="width:200px" placeholder="请选择机构状态">
+          <Option :value="0">正常</Option>
+          <Option :value="1">资料上传中</Option>
+        </Select>
+      </FormItem>
       <FormItem label="logo" prop="logo">
         <upload-media :max="1" :upload-param="{tableName: 'organization',targetId: ''}"
                       :default-list="form.logo ? [{url: form.logo}] : []"
