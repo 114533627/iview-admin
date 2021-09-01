@@ -70,7 +70,8 @@
       </FormItem>
 
       <FormItem label="介绍" prop="introduction">
-        <editor ref="editor" :value="form.introduction" @on-change="changeEditorHandle" />
+<!--        <editor ref="editor" :value="form.introduction" @on-change="changeEditorHandle" />-->
+        <ueditor  :upload-params="{tableName: 'organization'}" v-model="form.introduction"></ueditor>
       </FormItem>
       <FormItem v-show="false">
         <Button type="primary" @click="handleCancel('form')">取消</Button>
@@ -84,11 +85,13 @@
 <script>
 import UploadMedia from '../common/UploadMedia'
 import { mapGetters } from 'vuex'
-import Editor from '_c/editor'
+// import Editor from '_c/editor'
+import UEditor from '_c/common/Ueditor'
+import Ueditor from '../common/Ueditor'
 
 export default {
   name: 'OrganizationEdit',
-  components: { Editor, UploadMedia },
+  components: { Ueditor, /* Editor, */ UploadMedia, UEditor },
   props: {
     item: {
       type: Object

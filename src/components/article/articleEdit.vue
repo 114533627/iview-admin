@@ -54,7 +54,7 @@
           <Input v-model="form.introduction" type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="简介" />
         </FormItem>
         <FormItem  label="内容" prop="content" v-if="form.type!=='img'">
-          <editor ref="editor" :value="form.content" @on-change="changeEditorHandle" />
+          <ueditor ref="editor" v-model="form.content" :upload-params="{tableName: 'article'}" />
         </FormItem>
         <FormItem v-show="showFooter">
           <Button type="primary" @click="handleCancel('form')">取消</Button>
@@ -68,10 +68,10 @@
 <script>
 import UploadMedia from '../common/UploadMedia'
 import { mapGetters, mapMutations } from 'vuex'
-import Editor from '_c/editor'
+import Ueditor from '_c/common/Ueditor'
 export default {
   name: 'ArticleEdit',
-  components: { Editor, UploadMedia },
+  components: { Ueditor, UploadMedia },
   props: {
     item: {
       type: Object
