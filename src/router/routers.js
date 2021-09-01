@@ -234,6 +234,25 @@ export default [
     ]
   },
   {
+    path: '/letter',
+    name: 'letter',
+    component: Main,
+    meta: {
+      hideInBread: true
+    },
+    children: [
+      {
+        path: 'letter',
+        name: 'letter',
+        meta: {
+          icon: '_qq',
+          title: '消息管理'
+        },
+        component: () => import('@/view/letter/main.vue')
+      }
+    ]
+  },
+  {
     path: '/sys_config',
     name: 'sys_config',
     component: Main,

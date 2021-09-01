@@ -1,0 +1,232 @@
+<template>
+  <div class="letter-page">
+    <Row :gutter="10">
+      <Col :span="8">
+        <Card>
+          <div class="center ptb10">
+            <img class="ava mr20" :src="$store.state.user.avatarImgPath" alt="">
+            <div class="center column">
+              <h2>{{$store.state.user.userName}}</h2>
+              <Button class="mt10" type="primary" shape="circle">私信其它成员</Button>
+            </div>
+          </div>
+        </Card>
+      </Col>
+      <Col :span="16">
+        <Card>
+          <div class="flex">
+            <div class="item">
+              <div class="title">消息</div>
+              <div class="value">{{sta.total}}</div>
+            </div>
+            <div class="item">
+              <div class="title">未读</div>
+              <div class="value">{{sta.noReadNum}}</div>
+            </div>
+            <div class="item">
+              <div class="title">已回复</div>
+              <div class="value">{{sta.replyNum}}</div>
+            </div>
+            <div class="item">
+              <div class="title">已发出私信</div>
+              <div class="value">{{sta.startNum}}</div>
+            </div>
+          </div>
+        </Card>
+      </Col>
+    </Row>
+    <Row class="flex1 mt10 mh0" :gutter="10">
+      <Col :span="8" class="hfill">
+        <Card class="hfill bl-card column">
+          <div class="flex acenter" slot="title">
+            <div class="mr20">消息</div>
+            <Select class="flex1" clearable @on-change="changeStatus" v-model="onState" style="width:200px">
+              <Option v-for="(item, index) in status" :value="index" :key="index">{{ item }}</Option>
+            </Select>
+          </div>
+          <div class="column hfill">
+            <div class="flex1 meslist">
+              <div class="center" v-if="!total">暂无数据</div>
+              <div class="flex ptb10 acenter bb pointer" @click="on = index" v-for="(item, index) in list" :key="index">
+                <img class="min-ava" :src="item.from_area.img_url">
+                <div class="flex1">
+                  <div class="name">{{item.nickname}}</div>
+                  <div class="time">{{item.created_time}}</div>
+                </div>
+                <Icon type="ios-mail-outline" :size="25"/>
+              </div>
+            </div>
+            <Page class="center pt10" :current.sync="page" :total="total" simple :page-size="limit"/>
+          </div>
+        </Card>
+      </Col>
+      <Col :span="16" class="hfill">
+        <Card class="hfill" :class="on ? 'br-card' : 'nodata'">
+          <template v-if="on">
+            <div class="flex acenter" slot="title">
+              <img class="min-ava" :src="list[on].from_area.img_url">
+              <div class="flex1">
+                <div class="name">{{list[on].nickname}}</div>
+                <div class="time">{{list[on].created_time}}</div>
+              </div>
+              <div>
+                <Button class="mr10" type="primary" shape="circle" ghost>删除</Button>
+                <Button type="primary" shape="circle">回复</Button>
+              </div>
+            </div>
+            <div class="title">{{list[on].email}}</div>
+            <div class="content">{{list[on].content}}</div>
+          </template>
+          <template v-else>
+            <Icon type="ios-arrow-dropleft" class="mr10" :size="32"/>
+            <div>请选择私信</div>
+          </template>
+        </Card>
+      </Col>
+    </Row>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'letter',
+  data () {
+    return {
+      on: '',
+      status: ['未读', '已读'],
+      list: [],
+      onState: '',
+      page: 1,
+      total: 0,
+      limit: 15,
+      sta: {
+        noReadNum: 0,
+        replyNum: 0,
+        startNum: 0,
+        total: 0
+      }
+    }
+  },
+  created () {
+    this.getListData()
+    this.getData()
+  },
+  methods: {
+    changeStatus () {
+      this.page = 1
+      this.on = ''
+      this.getListData()
+    },
+    getData () {
+      this.$api.getMessageNum().then(res => {
+        this.sta = res.data
+      })
+    },
+    getListData () {
+      this.loading = true
+      // let params = { ...this.searchParams, ...this.page_info, sortBy: 'sort' }
+      this.$api.getMessageList({ readStatus: this.on, page: this.page, limit: this.limit }).then(res => {
+        if (res.code === 200) {
+          this.list = res.data
+          this.total = res.page_info.total
+        }
+      }).catch(err => {
+        this.$Message.error(err && err.desc ? err.desc : err)
+      })
+    }
+  }
+}
+</script>
+<style lang="less">
+.bl-card {
+  .ivu-card-head {
+    background: #ECF0f3 !important;
+    padding: 22.5px;
+  }
+  .ivu-card-body {
+    flex: 1;
+    min-height: 0;
+  }
+  .ivu-select-selection {
+    border-radius: 20px;
+    background: none !important;
+    border: 1px solid #2b85e4;
+    padding-left: 15px;
+    .ivu-icon {
+      color: #2b85e4;
+    }
+  }
+}
+.nodata {
+  .ivu-card-body {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+    color: #aaa;
+    line-height: 1;
+  }
+}
+.br-card {
+  .ivu-card-head {
+    background: #ECF0f3 !important;
+    padding-left: 30px;
+  }
+}
+</style>
+<style lang="less" scoped>
+.letter-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  .meslist {
+    overflow-y: auto;
+    min-height: 0;
+    height: 100%;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  .ava {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .item {
+    flex: 1;
+    padding: 21px 0;
+    text-align: center;
+    .value {
+      margin-top: 5px;
+      font-size: 28px;
+      color: #2b85e4;
+    }
+  }
+  .min-ava {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+  }
+  .time {
+    font-size: 12px;
+  }
+  .br-card {
+    .title {
+      color: #2b85e4;
+      font-size: 20px;
+      margin-left: 15px;
+      border-bottom: 1px solid #dcdee2;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+    }
+    .content {
+      margin-left: 15px;
+      white-space: pre-wrap;
+    }
+  }
+}
+</style>

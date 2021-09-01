@@ -117,7 +117,14 @@ export const delArea = ({ id }) => {
     params: { id }
   })
 }
-
+// 根据区域获取机构详情
+export const getAreaOrganization = (params) => {
+  return axios.request({
+    url: '/v1/frontend/area_organization',
+    method: 'get',
+    params: params
+  })
+}
 // 获取机构列表
 export const getOrganizationList = (params) => {
   return axios.request({
@@ -456,5 +463,13 @@ export const delMessage = ({ id }) => {
     url: '/v1/admin/message',
     method: 'delete',
     params: { id }
+  })
+}
+// 获取消息数统计
+export const getMessageNum = (params) => {
+  return axios.request({
+    url: '/v1/admin/message_num',
+    method: 'get',
+    params
   })
 }

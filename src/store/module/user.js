@@ -15,6 +15,7 @@ import { setToken, getToken, encryption, getRefreshToken, setRefreshToken, remov
 export default {
   state: {
     userName: '',
+    areaId: '',
     userId: '',
     avatarImgPath: '',
     token: getToken(),
@@ -37,6 +38,9 @@ export default {
     },
     setUserName (state, name) {
       state.userName = name
+    },
+    setAreaId (state, areaId) {
+      state.areaId = areaId
     },
     setAccess (state, access) {
       state.access = access
@@ -125,9 +129,10 @@ export default {
           commit('setToken', '')
           commit('setRefreshToken', '')
           commit('setAccess', [])
+          commit('setAreaId', '')
           removeFromStorage({ name: 'tagNaveList' })
           resolve()
-        }).catch(err => {
+        }).catch(() => {
           // reject(err)
           commit('setToken', '')
           commit('setRefreshToken', '')
@@ -148,6 +153,7 @@ export default {
             const data = res.data
             commit('setAvatar', data.avatar)
             commit('setUserName', data.name)
+            commit('setAreaId', data.area_id)
             commit('setUserId', data.id)
             commit('setAccess', 'home')
             commit('setHasGetInfo', true)
