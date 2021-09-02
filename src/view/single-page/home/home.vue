@@ -48,18 +48,18 @@
               <Icon type="ios-chatboxes" :size="25"/>
               <div class="name">查看私信</div>
             </router-link>
-            <router-link to="/article/list" class="item">
+            <div @click="addByMenu(3)" class="item">
               <Icon type="ios-briefcase" :size="25"/>
               <div class="name">发布活动</div>
-            </router-link>
+            </div>
             <router-link to="/article/list" class="item">
               <Icon type="md-images" :size="25"/>
               <div class="name">发布介绍</div>
             </router-link>
-            <router-link to="/article/list" class="item">
+            <div @click="addByMenu(4)" class="item">
               <Icon type="ios-megaphone" :size="25"/>
               <div class="name">发布大事件</div>
-            </router-link>
+            </div>
           </div>
         </Card>
       </Col>
@@ -72,27 +72,27 @@
         <router-link v-else to="/organization/list" slot="extra">
           <Button type="primary" shape="circle">查看全部</Button>
         </router-link>
-        <TabPane :label="tab.name" v-for="(tab, index) in tabs[lang]" :key="index">
+        <TabPane :label="tab.name" v-for="(tab, index0) in tabs[lang]" :key="index0">
           <!-- <div class="flex hfill"> -->
             <Row :gutter="20" class="hfill">
               <Col :span="6" v-for="(item, index) in tab.list" :key="index">
                 <div class="card">
-                  <img class="card-img" :src="item[index===0?'bg_media_url':'img_url']" alt="">
+                  <img class="card-img" :src="item[index0===0?'bg_media_url':'img_url']" alt="">
                   <div class="main">
                     <div class="name">{{item.name}}</div>
-                    <div class="desc">{{item[index===0?'remark':'introduction']}}</div>
+                    <div class="desc">{{item[index0===0?'remark':'introduction']}}</div>
                     <div class="bottom">
                       <div class="flex1">
                         <div class="title">Views</div>
                         <div class="value">123456</div>
                       </div>
-                      <Button shape="circle" size="small" type="primary" ghost>编辑</Button>
+                      <Button @click="edit(item, index)" shape="circle" size="small" type="primary" ghost>编辑</Button>
                     </div>
                   </div>
                 </div>
               </Col>
-              <Col :span="6" class="hfill" v-if="!tab.list.length || index>1">
-                <div class="card add column-center hfill">
+              <Col :span="6" class="hfill" v-if="!tab.list.length || index0>1">
+                <div @click="add()" class="card add column-center hfill">
                   <Icon type="md-add" :size="50"/>
                 </div>
               </Col>
@@ -133,6 +133,24 @@
         </TabPane>
       </Tabs>
     </div>
+    <Modal
+      ref="orgModal"
+      v-model="orgActive"
+      width="1000"
+      title="编辑机构信息"
+      @on-cancel="orgCancel">
+      <organization-edit ref="orgEdit" :item="itemBySet" operate="update" @editOk="orgOk"></organization-edit>
+    </Modal>
+    <Modal
+      ref="editModal"
+      v-model="boxShow"
+      width="1000"
+      :title="tabs[lang][this.onTab] ? '配置' + tabs[lang][this.onTab].name + '信息' : ''"
+      @on-ok="okHandle"
+      @on-cancel="cancelHandle">
+      <article-edit ref="edit" :item="itemBySet" :operate="operate" :org-arti-type="types[this.onTab]"
+                    @editOk="editOkHandle"></article-edit>
+    </Modal>
   </div>
 </template>
 
@@ -141,6 +159,8 @@ import InforCard from '_c/info-card'
 import CountTo from '_c/count-to'
 import { ChartPie, ChartBar } from '_c/charts'
 import Example from './example.vue'
+import OrganizationEdit from '../../../components/organization/organizationEdit'
+import ArticleEdit from '../../../components/article/articleEdit'
 export default {
   name: 'home',
   components: {
@@ -148,10 +168,15 @@ export default {
     CountTo,
     ChartPie,
     ChartBar,
-    Example
+    Example,
+    OrganizationEdit,
+    ArticleEdit
   },
   data () {
     return {
+      operate: 'update',
+      boxShow: false,
+      orgActive: false,
       onTab: 0,
       inforCardData: [
         { title: '新增用户', icon: 'md-person-add', count: 803, color: '#2d8cf0' },
@@ -183,6 +208,8 @@ export default {
         zh: [],
         en: []
       },
+      itemBySet: {},
+      indexBySet: 0,
       lang: 'zh',
       types: ['', 'ljgd', 'jujiao', 'hdrl', 'csdsj']
     }
@@ -202,20 +229,83 @@ export default {
   created () {
     this.getDataList()
   },
+  mounted () {
+    this.$refs.orgModal.ok = () => {
+      this.tabs[this.lang][0].list[0] = JSON.parse(JSON.stringify(this.$refs.orgEdit.form))
+      this.$refs.orgEdit.handleSubmit()
+    }
+    this.$refs.editModal.ok = () => {
+      this.$refs.edit.handleSubmit()
+    }
+  },
   methods: {
+    addByMenu (index) {
+      this.onTab = index
+      this.add()
+    },
+    okHandle () {
+      this.$refs.edit.handleSubmit()
+    },
+    cancelHandle () {
+      this.$refs.edit.handleCancel()
+    },
+    orgOk () {
+      this.orgActive = false
+    },
+    orgCancel () {
+      this.$refs.orgEdit.handleCancel()
+    },
+    edit (item, index) {
+      this.itemBySet = { ...item }
+      this.indexBySet = index
+      this.operate = 'update'
+      if (this.onTab) {
+        this.boxShow = true
+      } else {
+        this.orgActive = true
+      }
+    },
+    add () {
+      this.itemBySet = {}
+      this.indexBySet = this.tabs[this.lang][this.onTab].list.length + 1
+      this.boxShow = true
+      this.operate = 'add'
+      setTimeout(() => {
+        this.$refs.edit.$refs.form.resetFields()
+      }, 20)
+    },
     getTabsData () {
       this.types.forEach((type, val) => {
         if (type && !this.tabs[this.lang][val].list.length) {
-          this.$api.getArticleList({ orgId: this.tabs[this.lang][0].list[0].id, orgArtiType: type, page: 1, limit: 3, tab: 'self' }).then(res => {
-            if (res.code === 200) {
-              this.tabs[this.lang][val].list = res.data
-              this.tabs[this.lang][val].total = res.page_info.total
-            }
-          }).catch(err => {
-            this.$Message.error(err && err.desc ? err.desc : err)
-          })
+          // this.$api.getArticleList({ orgId: this.tabs[this.lang][0].list[0].id, orgArtiType: type, page: 1, limit: 3, tab: 'self' }).then(res => {
+          //   if (res.code === 200) {
+          //     this.tabs[this.lang][val].list = res.data
+          //     this.tabs[this.lang][val].total = res.page_info.total
+          //   }
+          // }).catch(err => {
+          //   this.$Message.error(err && err.desc ? err.desc : err)
+          // })
+          this.setTabItem(val)
         }
       })
+    },
+    setTabItem (val) {
+      this.$api.getArticleList({ orderBy: 'created_time', orgId: this.tabs[this.lang][0].list[0].id, orgArtiType: this.types[val], page: 1, limit: 3, tab: 'self' }).then(res => {
+        if (res.code === 200) {
+          this.tabs[this.lang][val].list = res.data
+          this.tabs[this.lang][val].total = res.page_info.total
+        }
+      }).catch(err => {
+        this.$Message.error(err && err.desc ? err.desc : err)
+      })
+    },
+    editOkHandle () {
+      this.boxShow = false
+      if (this.operate === 'update') {
+        this.tabs[this.lang][this.onTab].list[this.indexBySet] = JSON.parse(JSON.stringify(this.$refs.edit.form))
+      } else {
+        this.setTabItem(this.onTab)
+      }
     },
     getDataList () {
       this.$api.getOrganizationList({ page: 1, limit: 2 }).then(res => {
