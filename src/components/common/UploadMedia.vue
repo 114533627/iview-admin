@@ -117,7 +117,7 @@ export default {
       this.selfDefaultList.push({ url: res.data.preview_url, id: res.data.id, name: res.data.name })
       this.$emit('uploadOver', this.selfDefaultList)
     },
-    handleError (err, file, fileList) {
+    handleError () {
 
     },
     handleFormatError (file) {

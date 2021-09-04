@@ -125,7 +125,7 @@
               </div>
             </Col>
             <Col :span="8" class="ptb10">
-              <div class="mes flex1 add center">
+              <div class="mes flex1 add center" @click="addLetter">
                 <Icon type="md-add" :size="50"/>
               </div>
             </Col>
@@ -151,6 +151,7 @@
       <article-edit ref="edit" :item="itemBySet" :operate="operate" :org-arti-type="types[this.onTab]"
                     @editOk="editOkHandle"></article-edit>
     </Modal>
+    <letter-edit @submit="getLetter" v-model="activeLetter"></letter-edit>
   </div>
 </template>
 
@@ -161,6 +162,7 @@ import { ChartPie, ChartBar } from '_c/charts'
 import Example from './example.vue'
 import OrganizationEdit from '../../../components/organization/organizationEdit'
 import ArticleEdit from '../../../components/article/articleEdit'
+import letterEdit from '../../../components/letter/edit'
 export default {
   name: 'home',
   components: {
@@ -170,10 +172,12 @@ export default {
     ChartBar,
     Example,
     OrganizationEdit,
-    ArticleEdit
+    ArticleEdit,
+    letterEdit
   },
   data () {
     return {
+      activeLetter: true,
       operate: 'update',
       boxShow: false,
       orgActive: false,
@@ -228,6 +232,7 @@ export default {
   },
   created () {
     this.getDataList()
+    this.getLetter()
   },
   mounted () {
     this.$refs.orgModal.ok = () => {
@@ -239,6 +244,9 @@ export default {
     }
   },
   methods: {
+    addLetter () {
+      this.activeLetter = true
+    },
     addByMenu (index) {
       this.onTab = index
       this.add()
@@ -325,7 +333,9 @@ export default {
       }).catch(err => {
         this.$Message.error(err && err.desc ? err.desc : err)
       })
-      this.$api.getMessageList({ page: 1, limit: 5 }).then(res => {
+    },
+    getLetter () {
+      this.$api.getMessageList({ page: 1, limit: 5, type: 'start' }).then(res => {
         if (res.code === 200) {
           this.letterList = res.data
           this.total = res.page_info.total
