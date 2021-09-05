@@ -7,7 +7,7 @@
             <img class="ava mr20" :src="$store.state.user.avatarImgPath" alt="">
             <div class="center column">
               <h2>{{$store.state.user.userName}}</h2>
-              <Button class="mt10" type="primary" shape="circle">私信其它成员</Button>
+              <Button @click="addLetter" class="mt10" type="primary" shape="circle">私信其它成员</Button>
             </div>
           </div>
         </Card>
@@ -47,10 +47,10 @@
           <div class="column hfill">
             <div class="flex1 meslist">
               <div class="center" v-if="!total">暂无数据</div>
-              <div class="flex ptb10 acenter bb pointer" @click="on = index" v-for="(item, index) in list" :key="index">
+              <div class="flex ptb10 acenter bb pointer" @click="selectLetter(item)" v-for="(item, index) in list" :key="index">
                 <img class="min-ava" :src="item.from_area.img_url">
                 <div class="flex1">
-                  <div class="name">{{item.nickname}}</div>
+                  <div class="name">{{item.from_area.name_zh}}</div>
                   <div class="time">{{item.created_time}}</div>
                 </div>
                 <Icon type="ios-mail-outline" :size="25"/>
@@ -61,21 +61,21 @@
         </Card>
       </Col>
       <Col :span="16" class="hfill">
-        <Card class="hfill" :class="on ? 'br-card' : 'nodata'">
-          <template v-if="on">
-            <div class="flex acenter" slot="title">
-              <img class="min-ava" :src="list[on].from_area.img_url">
-              <div class="flex1">
-                <div class="name">{{list[on].nickname}}</div>
-                <div class="time">{{list[on].created_time}}</div>
-              </div>
-              <div>
-                <Button class="mr10" type="primary" shape="circle" ghost>删除</Button>
-                <Button type="primary" shape="circle">回复</Button>
-              </div>
+        <Card class="hfill" :class="onMessage.id ? 'br-card' : 'nodata'">
+          <div v-show="onMessage.id" class="flex acenter" slot="title">
+            <img class="min-ava" :src="onMessage.from_area.img_url">
+            <div class="flex1">
+              <div class="name">{{onMessage.from_area.name_zh}}</div>
+              <div class="time mt10">{{onMessage.from_area.created_time}}</div>
             </div>
-            <div class="title">{{list[on].email}}</div>
-            <div class="content">{{list[on].content}}</div>
+            <div>
+              <Button class="mr10" type="primary" shape="circle" @click="delLetter" ghost>删除</Button>
+              <Button type="primary" shape="circle" @click="replyLetter">回复</Button>
+            </div>
+          </div>
+          <template v-if="onMessage.id">
+            <div class="title">{{onMessage.title}}</div>
+            <div class="content">{{onMessage.content}}</div>
           </template>
           <template v-else>
             <Icon type="ios-arrow-dropleft" class="mr10" :size="32"/>
@@ -84,15 +84,21 @@
         </Card>
       </Col>
     </Row>
+    <letter-edit :type="letterType" :toId="onMessage.id" @submit="reloadLetter" v-model="activeLetter"></letter-edit>
   </div>
 </template>
 
 <script>
+import letterEdit from '../../components/letter/edit'
 export default {
   name: 'letter',
+  components: { letterEdit },
   data () {
     return {
       on: '',
+      letterType: 'start',
+      activeLetter: false,
+      letterId: undefined,
       status: ['未读', '已读'],
       list: [],
       onState: '',
@@ -104,6 +110,10 @@ export default {
         replyNum: 0,
         startNum: 0,
         total: 0
+      },
+      onMessage: {
+        id: undefined,
+        from_area: {}
       }
     }
   },
@@ -112,9 +122,54 @@ export default {
     this.getData()
   },
   methods: {
+    selectLetter (item) {
+      item.read_status === 0 && this.getListData()
+      this.$api.getMessage({ id: item.id }).then(res => {
+        if (res.code === 200) {
+          this.onMessage = res.data
+        }
+      }).catch(err => {
+        this.$Message.error(err && err.desc ? err.desc : err)
+      })
+    },
+    replyLetter (id) {
+      // this.letterId = this.onMessage.id
+      this.letterType = 'reply'
+      this.activeLetter = true
+      this.replyId = id
+    },
+    delLetter () {
+      this.$Modal.confirm({
+        title: '确定要删除吗？',
+        content: '请谨慎操作！',
+        onOk: () => {
+          this.$api.delMessage({ id: this.onMessage.id }).then(res => {
+            if (res.code === 200) {
+              this.getListData()
+              this.onMessage = { id: undefined, from_area: {} }
+              this.$Message.success('删除成功')
+            }
+          }).catch(err => {
+            this.$Message.error(err && err.desc ? err.desc : err)
+          })
+        }
+      })
+    },
+    addLetter () {
+      this.letterType = 'start'
+      this.onMessage = {
+        id: undefined,
+        from_area: {}
+      }
+      this.activeLetter = true
+    },
+    reloadLetter () {
+      this.page = 1
+      this.getListData()
+    },
     changeStatus () {
       this.page = 1
-      this.on = ''
+      // this.onMessage = { id: undefined, from_area: {} }
       this.getListData()
     },
     getData () {
@@ -125,7 +180,7 @@ export default {
     getListData () {
       this.loading = true
       // let params = { ...this.searchParams, ...this.page_info, sortBy: 'sort' }
-      this.$api.getMessageList({ readStatus: this.on, page: this.page, limit: this.limit }).then(res => {
+      this.$api.getMessageList({ readStatus: this.onState, page: this.page, limit: this.limit }).then(res => {
         if (res.code === 200) {
           this.list = res.data
           this.total = res.page_info.total
@@ -158,6 +213,9 @@ export default {
   }
 }
 .nodata {
+  .ivu-card-head {
+    padding: 0;
+  }
   .ivu-card-body {
     height: 100%;
     display: flex;

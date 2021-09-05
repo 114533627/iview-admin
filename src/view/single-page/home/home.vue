@@ -111,16 +111,16 @@
             <Col :span="8" class="ptb10" v-for="(item, index) in letterList" :key="index">
               <div class="mes">
                 <div class="mes-top">
-                  <img class="ava" :src="item.from_area.img_url" alt="">
+                  <img class="ava" :src="item.to_area.img_url" alt="">
                   <div class="flex1">
-                    <div class="name">{{item.nickname}}</div>
+                    <div class="name">{{item.title}}</div>
                     <div class="desc">{{item.content}}</div>
                   </div>
                 </div>
                 <div class="bottom">
                   <Icon type="ios-mail-outline" :size="23"/>
                   <div class="value flex1">{{item.read_status==1?'已读':'未读'}}</div>
-                  <Button shape="circle" size="small" type="primary" ghost>编辑</Button>
+                  <Button @click="editLetter(item.id)" shape="circle" size="small" type="primary" ghost>编辑</Button>
                 </div>
               </div>
             </Col>
@@ -151,7 +151,7 @@
       <article-edit ref="edit" :item="itemBySet" :operate="operate" :org-arti-type="types[this.onTab]"
                     @editOk="editOkHandle"></article-edit>
     </Modal>
-    <letter-edit @submit="getLetter" v-model="activeLetter"></letter-edit>
+    <letter-edit :id="letterId" @submit="getLetter" v-model="activeLetter"></letter-edit>
   </div>
 </template>
 
@@ -177,7 +177,8 @@ export default {
   },
   data () {
     return {
-      activeLetter: true,
+      letterId: undefined,
+      activeLetter: false,
       operate: 'update',
       boxShow: false,
       orgActive: false,
@@ -245,6 +246,11 @@ export default {
   },
   methods: {
     addLetter () {
+      this.letterId = undefined
+      this.activeLetter = true
+    },
+    editLetter (id) {
+      this.letterId = id
       this.activeLetter = true
     },
     addByMenu (index) {
@@ -335,7 +341,7 @@ export default {
       })
     },
     getLetter () {
-      this.$api.getMessageList({ page: 1, limit: 5, type: 'start' }).then(res => {
+      this.$api.getMessageList({ page: 1, limit: 5, type: 'start', orderBy: 'created_time' }).then(res => {
         if (res.code === 200) {
           this.letterList = res.data
           this.total = res.page_info.total
