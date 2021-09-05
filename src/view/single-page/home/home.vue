@@ -347,7 +347,7 @@ export default {
       })
     },
     getLetter () {
-      this.$api.getMessageList({ page: 1, limit: 5, type: 'start', orderBy: 'created_time' }).then(res => {
+      this.$api.getMessageList({ page: 1, limit: 5, types: 'guest,reply', orderBy: 'created_time' }).then(res => {
         if (res.code === 200) {
           this.letterList = res.data
           this.total = res.page_info.total
