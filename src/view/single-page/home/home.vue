@@ -120,7 +120,7 @@
                 <div class="bottom">
                   <Icon type="ios-mail-outline" :size="23"/>
                   <div class="value flex1">{{item.read_status==1?'已读':'未读'}}</div>
-                  <Button @click="editLetter(item.id)" shape="circle" size="small" type="primary" ghost>编辑</Button>
+                  <Button @click="editLetter(item.id)" shape="circle" size="small" type="primary" ghost>查看</Button>
                 </div>
               </div>
             </Col>
@@ -250,8 +250,14 @@ export default {
       this.activeLetter = true
     },
     editLetter (id) {
-      this.letterId = id
-      this.activeLetter = true
+      // this.letterId = id
+      // this.activeLetter = true
+      this.$router.push({
+        name: 'letter',
+        params: {
+          id: id
+        }
+      })
     },
     addByMenu (index) {
       this.onTab = index

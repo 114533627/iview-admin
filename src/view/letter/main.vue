@@ -47,7 +47,7 @@
           <div class="column hfill">
             <div class="flex1 meslist">
               <div class="center" v-if="!total">暂无数据</div>
-              <div class="flex ptb10 acenter bb pointer" @click="selectLetter(item)" v-for="(item, index) in list" :key="index">
+              <div class="flex ptb10 acenter bb pointer" @click="selectLetter(item.id)" v-for="(item, index) in list" :key="index">
                 <template v-if="item.type==='start'">
                   <img class="min-ava" :src="item.from_area.img_url">
                   <div class="flex1">
@@ -125,6 +125,11 @@ import letterEdit from '../../components/letter/edit'
 export default {
   name: 'letter',
   components: { letterEdit },
+  props: {
+    id: {
+      type: [String, Number]
+    }
+  },
   data () {
     return {
       on: '',
@@ -150,15 +155,25 @@ export default {
     }
   },
   created () {
+    if (this.id) {
+      this.selectLetter(this.id)
+    }
     this.getListData()
     this.getData()
   },
+  watch: {
+    id (val) {
+      if (val) {
+        this.selectLetter(this.id)
+      }
+    }
+  },
   methods: {
-    selectLetter (item) {
-      this.$api.getMessage({ id: item.id }).then(res => {
+    selectLetter (id) {
+      this.$api.getMessage({ id }).then(res => {
         if (res.code === 200) {
           this.onMessage = res.data
-          item.read_status === 0 && this.getListData()
+          res.data.read_status === 0 && this.getListData()
         }
       }).catch(err => {
         this.$Message.error(err && err.desc ? err.desc : err)
