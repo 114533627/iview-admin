@@ -48,11 +48,27 @@
             <div class="flex1 meslist">
               <div class="center" v-if="!total">暂无数据</div>
               <div class="flex ptb10 acenter bb pointer" @click="selectLetter(item)" v-for="(item, index) in list" :key="index">
-                <img class="min-ava" :src="item.from_area.img_url">
-                <div class="flex1">
-                  <div class="name">{{item.from_area.name_zh}}</div>
-                  <div class="time">{{item.created_time}}</div>
-                </div>
+                <template v-if="item.type==='start'">
+                  <img class="min-ava" :src="item.from_area.img_url">
+                  <div class="flex1">
+                    <div class="name">{{item.from_area.name_zh + ' / ' + item.from_area.name_en}}</div>
+                    <div class="time">{{item.created_time}}</div>
+                  </div>
+                </template>
+                <template v-else-if="item.type==='guest'">
+                  <img class="min-ava" :src="item.to_area.img_url">
+                  <div class="flex1">
+                    <div class="name">{{item.to_area.name_zh + ' / ' + item.to_area.name_en}}</div>
+                    <div class="time">{{item.created_time}}</div>
+                  </div>
+                </template>
+                <template v-else-if="item.type==='reply'">
+                  <img class="min-ava" :src="item.to_area.img_url">
+                  <div class="flex1">
+                    <div class="name">{{item.to_area.name_zh + ' / ' + item.to_area.name_en}}</div>
+                    <div class="time">{{item.created_time}}</div>
+                  </div>
+                </template>
                 <Icon type="ios-mail-outline" :size="25"/>
               </div>
             </div>
@@ -63,11 +79,27 @@
       <Col :span="16" class="hfill">
         <Card class="hfill" :class="onMessage.id ? 'br-card' : 'nodata'">
           <div v-show="onMessage.id" class="flex acenter" slot="title">
-            <img class="min-ava" :src="onMessage.from_area.img_url">
-            <div class="flex1">
-              <div class="name">{{onMessage.from_area.name_zh}}</div>
-              <div class="time mt10">{{onMessage.from_area.created_time}}</div>
-            </div>
+            <template v-if="onMessage.type==='start'">
+              <img class="min-ava" :src="onMessage.from_area.img_url">
+              <div class="flex1">
+                <div class="name">{{onMessage.from_area.name_zh}}</div>
+                <div class="time mt10">{{onMessage.created_time}}</div>
+              </div>
+            </template>
+            <template v-else-if="onMessage.type==='guest'">
+              <img class="min-ava" :src="onMessage.to_area.img_url">
+              <div class="flex1">
+                <div class="name">{{onMessage.to_area.name_zh}}</div>
+                <div class="time mt10">{{onMessage.to_area.created_time}}</div>
+              </div>
+            </template>
+            <template v-else-if="onMessage.type==='reply'">
+              <img class="min-ava" :src="onMessage.to_area.img_url">
+              <div class="flex1">
+                <div class="name">{{onMessage.to_area.name_zh}}</div>
+                <div class="time mt10">{{onMessage.to_area.created_time}}</div>
+              </div>
+            </template>
             <div>
               <Button class="mr10" type="primary" shape="circle" @click="delLetter" ghost>删除</Button>
               <Button type="primary" shape="circle" @click="replyLetter">回复</Button>
@@ -123,10 +155,10 @@ export default {
   },
   methods: {
     selectLetter (item) {
-      item.read_status === 0 && this.getListData()
       this.$api.getMessage({ id: item.id }).then(res => {
         if (res.code === 200) {
           this.onMessage = res.data
+          item.read_status === 0 && this.getListData()
         }
       }).catch(err => {
         this.$Message.error(err && err.desc ? err.desc : err)
