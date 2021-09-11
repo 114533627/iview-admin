@@ -20,22 +20,22 @@
                 </RadioGroup>
               </div>
               <div class="nums mt10">
-                <div class="column-center">
+                <router-link to="/article/list" class="column-center">
                   <div class="title">介绍</div>
                   <div class="value">1</div>
-                </div>
-                <div class="column-center" v-if="tabs[lang][4]">
+                </router-link>
+                <router-link :to="'/organization/jujiao?org_id='+tabs[lang][0].list[0].id+'&org_arti_type=csdsj&name='+tabs[lang][0].list[0].name" class="column-center" v-if="tabs[lang][4]">
                   <div class="title">大事件</div>
                   <div class="value">{{tabs[lang][4].total}}</div>
-                </div>
-                <div class="column-center" v-if="tabs[lang][3]">
+                </router-link>
+                <router-link :to="'/organization/jujiao?org_id='+tabs[lang][0].list[0].id+'&org_arti_type=hdrl&name='+tabs[lang][0].list[0].name" class="column-center" v-if="tabs[lang][3]">
                   <div class="title">活动日历</div>
                   <div class="value">{{tabs[lang][3].total}}</div>
-                </div>
-                <div class="column-center">
+                </router-link>
+                <router-link to="/letter/letter" class="column-center">
                   <div class="title">站内私信</div>
                   <div class="value">{{total}}</div>
-                </div>
+                </router-link>
               </div>
             </div>
           </div>
@@ -434,6 +434,7 @@ export default {
     min-width: 50px;
   }
   .title {
+    color: #666;
     font-size: 12px;
   }
   .value {

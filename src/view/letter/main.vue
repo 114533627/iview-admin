@@ -15,19 +15,19 @@
       <Col :span="16">
         <Card>
           <div class="flex">
-            <div class="item">
+            <div class="item" @click="selectType('')">
               <div class="title">消息</div>
               <div class="value">{{sta.total}}</div>
             </div>
-            <div class="item">
+            <div class="item" @click="selectType(0)">
               <div class="title">未读</div>
               <div class="value">{{sta.noReadNum}}</div>
             </div>
-            <div class="item">
+            <div class="item" @click="selectType(3)">
               <div class="title">已回复</div>
               <div class="value">{{sta.replyNum}}</div>
             </div>
-            <div class="item">
+            <div class="item" @click="selectType(2)">
               <div class="title">已发出私信</div>
               <div class="value">{{sta.startNum}}</div>
             </div>
@@ -40,8 +40,8 @@
         <Card class="hfill bl-card column">
           <div class="flex acenter" slot="title">
             <div class="mr20">消息</div>
-            <Select class="flex1" clearable @on-change="changeStatus" v-model="onState" style="width:200px">
-              <Option v-for="(item, index) in status" :value="index" :key="index">{{ item }}</Option>
+            <Select class="flex1" placeholder="请选择类型" clearable @on-change="changeStatus" v-model="onState" style="width:200px">
+              <Option v-for="(item, index) in types" :value="index" :key="index">{{ item.label }}</Option>
             </Select>
           </div>
           <div class="column hfill">
@@ -136,7 +136,13 @@ export default {
       letterType: 'start',
       activeLetter: false,
       letterId: undefined,
-      status: ['未读', '已读'],
+      types: [
+        { type: 'readStatus', label: '未读', value: 0 },
+        { type: 'readStatus', label: '已读', value: 1 },
+        { type: 'type', label: '发起', value: 'start' },
+        { type: 'type', label: '回复', value: 'reply' },
+        { type: 'type', label: '访客留言', value: 'guest' }
+      ],
       list: [],
       onState: '',
       page: 1,
@@ -169,6 +175,10 @@ export default {
     }
   },
   methods: {
+    selectType (val) {
+      this.onState = val
+      this.changeStatus()
+    },
     selectLetter (id) {
       this.$api.getMessage({ id }).then(res => {
         if (res.code === 200) {
@@ -222,12 +232,15 @@ export default {
     getData () {
       this.$api.getMessageNum().then(res => {
         this.sta = res.data
+      }).catch((err) => {
+        this.$Message.error(err && err.desc ? err.desc : err)
       })
     },
     getListData () {
       this.loading = true
       // let params = { ...this.searchParams, ...this.page_info, sortBy: 'sort' }
-      this.$api.getMessageList({ readStatus: this.onState, page: this.page, limit: this.limit }).then(res => {
+      let typeData = this.onState === '' ? {} : { [this.types[this.onState].type]: this.types[this.onState].value }
+      this.$api.getMessageList({ ...typeData, page: this.page, limit: this.limit }).then(res => {
         if (res.code === 200) {
           this.list = res.data
           this.total = res.page_info.total
@@ -303,6 +316,7 @@ export default {
     flex: 1;
     padding: 21px 0;
     text-align: center;
+    cursor: pointer;
     .value {
       margin-top: 5px;
       font-size: 28px;
