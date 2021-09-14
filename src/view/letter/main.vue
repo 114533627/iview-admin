@@ -108,6 +108,11 @@
           <template v-if="onMessage.id">
             <div class="title">{{onMessage.title}}</div>
             <div class="content">{{onMessage.content}}</div>
+            <div class="mt20" v-for="(file, index) in onMessage.attachments" :key="index">
+              <div>
+                <Button type="text" :to="file.url" target="_blank" :download="file.name" icon="ios-link">{{file.name}}</Button>
+              </div>
+            </div>
           </template>
           <template v-else>
             <Icon type="ios-arrow-dropleft" class="mr10" :size="32"/>
@@ -182,7 +187,7 @@ export default {
     selectLetter (id) {
       this.$api.getMessage({ id }).then(res => {
         if (res.code === 200) {
-          this.onMessage = res.data
+          this.onMessage = { ...res.data, attachments: JSON.parse(res.data.attachments || '[]') }
           res.data.read_status === 0 && this.getListData()
         }
       }).catch(err => {
@@ -222,6 +227,7 @@ export default {
     },
     reloadLetter () {
       this.page = 1
+      this.$Message.success('发送成功！')
       this.getListData()
     },
     changeStatus () {
@@ -239,7 +245,7 @@ export default {
     getListData () {
       this.loading = true
       // let params = { ...this.searchParams, ...this.page_info, sortBy: 'sort' }
-      let typeData = this.onState === '' ? {} : { [this.types[this.onState].type]: this.types[this.onState].value }
+      let typeData = this.onState === '' || this.onState === undefined ? {} : { [this.types[this.onState].type]: this.types[this.onState].value }
       this.$api.getMessageList({ ...typeData, page: this.page, limit: this.limit }).then(res => {
         if (res.code === 200) {
           this.list = res.data

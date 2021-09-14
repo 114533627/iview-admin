@@ -14,7 +14,7 @@
           <Input type="textarea" v-model="form.content" placeholder="请输入内容"></Input>
         </FormItem>
         <FormItem label="附件" prop="avatar">
-          <upload-file type="message" v-model="form.attachments"></upload-file>
+          <upload-file ref="upload" type="message" v-model="form.attachments"></upload-file>
         </FormItem>
       </Form>
       <div slot="footer">
@@ -75,12 +75,14 @@ export default {
       this.form = this.$options.data().form
       setTimeout(() => {
         this.$refs.form.resetFields()
+        this.$refs.upload.$refs.upload.clearFiles()
       }, 20)
       if (val) {
         this.getData()
       }
     },
     toId (val) {
+      this.$refs.upload.$refs.upload.clearFiles()
       this.form = this.$options.data().form
       setTimeout(() => {
         this.$refs.form.resetFields()

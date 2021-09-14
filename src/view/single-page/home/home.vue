@@ -20,9 +20,9 @@
                 </RadioGroup>
               </div>
               <div class="nums mt10">
-                <router-link to="/article/list" class="column-center">
+                <router-link to="/organization/list" class="column-center">
                   <div class="title">介绍</div>
-                  <div class="value">1</div>
+                  <div class="value">{{introduceNum}}</div>
                 </router-link>
                 <router-link :to="'/organization/jujiao?org_id='+tabs[lang][0].list[0].id+'&org_arti_type=csdsj&name='+tabs[lang][0].list[0].name" class="column-center" v-if="tabs[lang][4]">
                   <div class="title">大事件</div>
@@ -182,6 +182,7 @@ export default {
       operate: 'update',
       boxShow: false,
       orgActive: false,
+      introduceNum: 0,
       onTab: 0,
       inforCardData: [
         { title: '新增用户', icon: 'md-person-add', count: 803, color: '#2d8cf0' },
@@ -331,6 +332,7 @@ export default {
       this.$api.getOrganizationList({ page: 1, limit: 2 }).then(res => {
         if (res.code === 200) {
           this.lang = res.data[0].lang
+          this.introduceNum = res.page_info.total
           this.tabs = Object.assign({}, ...res.data.map(item => ({
             [item.lang]: [
               { name: '介绍', list: [item], total: 1 },
