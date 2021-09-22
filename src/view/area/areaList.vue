@@ -184,13 +184,12 @@ export default {
           render: (h, { row, column, index }) => {
             return h(Operate, {
               props: {
-                need: { status: { show: true, text: row.status === 0 ? '启用' : '停用' }, edit: true, del: true, csjggx: row.type === 1 || row.type === -1 },
+                need: { edit: true, del: true, csjggx: row.type === 1 || row.type === -1 },
                 rowData: row
               },
               on: {
                 edit: this.editHandle,
                 del: this.delHandle,
-                status: this.statusHandle,
                 csjggx: this.csjggxHandle
               }
             })
