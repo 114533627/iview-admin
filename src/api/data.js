@@ -445,8 +445,7 @@ export const getMessageList = (params) => {
 export const getMessage = ({ id }) => {
   return axios.request({
     url: '/v1/admin/message/' + id,
-    method: 'get',
-    data: params
+    method: 'get'
   })
 }
 // 回复消息信息
@@ -469,6 +468,22 @@ export const delMessage = ({ id }) => {
 export const getMessageNum = (params) => {
   return axios.request({
     url: '/v1/admin/message_num',
+    method: 'get',
+    params
+  })
+}
+// 选择用户
+export const userSelect = (params) => {
+  return axios.request({
+    url: '/v1/admin/user_select',
+    method: 'get',
+    params
+  })
+}
+// 选择区域
+export const areaSelect = (params) => {
+  return axios.request({
+    url: '/v1/admin/area_select',
     method: 'get',
     params
   })

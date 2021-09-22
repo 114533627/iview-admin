@@ -7,7 +7,7 @@
             <img class="ava mr20" :src="$store.state.user.avatarImgPath" alt="">
             <div class="center column">
               <h2>{{$store.state.user.userName}}</h2>
-              <Button class="mt10" type="primary" shape="circle">私信其它成员</Button>
+              <Button @click="addLetter" class="mt10" type="primary" shape="circle">私信其它成员</Button>
             </div>
           </div>
         </Card>
@@ -15,19 +15,19 @@
       <Col :span="16">
         <Card>
           <div class="flex">
-            <div class="item">
+            <div class="item" @click="selectType('')">
               <div class="title">消息</div>
               <div class="value">{{sta.total}}</div>
             </div>
-            <div class="item">
+            <div class="item" @click="selectType(0)">
               <div class="title">未读</div>
               <div class="value">{{sta.noReadNum}}</div>
             </div>
-            <div class="item">
+            <div class="item" @click="selectType(3)">
               <div class="title">已回复</div>
               <div class="value">{{sta.replyNum}}</div>
             </div>
-            <div class="item">
+            <div class="item" @click="selectType(2)">
               <div class="title">已发出私信</div>
               <div class="value">{{sta.startNum}}</div>
             </div>
@@ -40,19 +40,35 @@
         <Card class="hfill bl-card column">
           <div class="flex acenter" slot="title">
             <div class="mr20">消息</div>
-            <Select class="flex1" clearable @on-change="changeStatus" v-model="onState" style="width:200px">
-              <Option v-for="(item, index) in status" :value="index" :key="index">{{ item }}</Option>
+            <Select class="flex1" placeholder="请选择类型" clearable @on-change="changeStatus" v-model="onState" style="width:200px">
+              <Option v-for="(item, index) in types" :value="index" :key="index">{{ item.label }}</Option>
             </Select>
           </div>
           <div class="column hfill">
             <div class="flex1 meslist">
               <div class="center" v-if="!total">暂无数据</div>
-              <div class="flex ptb10 acenter bb pointer" @click="on = index" v-for="(item, index) in list" :key="index">
-                <img class="min-ava" :src="item.from_area.img_url">
-                <div class="flex1">
-                  <div class="name">{{item.nickname}}</div>
-                  <div class="time">{{item.created_time}}</div>
-                </div>
+              <div class="flex ptb10 acenter bb pointer" @click="selectLetter(item.id)" v-for="(item, index) in list" :key="index">
+                <template v-if="item.type==='start'">
+                  <img class="min-ava" :src="item.from_area.img_url">
+                  <div class="flex1">
+                    <div class="name">{{item.from_area.name_zh + ' / ' + item.from_area.name_en}}</div>
+                    <div class="time">{{item.created_time}}</div>
+                  </div>
+                </template>
+                <template v-else-if="item.type==='guest'">
+                  <img class="min-ava" :src="item.to_area.img_url">
+                  <div class="flex1">
+                    <div class="name">{{item.to_area.name_zh + ' / ' + item.to_area.name_en}}</div>
+                    <div class="time">{{item.created_time}}</div>
+                  </div>
+                </template>
+                <template v-else-if="item.type==='reply'">
+                  <img class="min-ava" :src="item.to_area.img_url">
+                  <div class="flex1">
+                    <div class="name">{{item.to_area.name_zh + ' / ' + item.to_area.name_en}}</div>
+                    <div class="time">{{item.created_time}}</div>
+                  </div>
+                </template>
                 <Icon type="ios-mail-outline" :size="25"/>
               </div>
             </div>
@@ -61,21 +77,42 @@
         </Card>
       </Col>
       <Col :span="16" class="hfill">
-        <Card class="hfill" :class="on ? 'br-card' : 'nodata'">
-          <template v-if="on">
-            <div class="flex acenter" slot="title">
-              <img class="min-ava" :src="list[on].from_area.img_url">
+        <Card class="hfill" :class="onMessage.id ? 'br-card' : 'nodata'">
+          <div v-show="onMessage.id" class="flex acenter" slot="title">
+            <template v-if="onMessage.type==='start'">
+              <img class="min-ava" :src="onMessage.from_area.img_url">
               <div class="flex1">
-                <div class="name">{{list[on].nickname}}</div>
-                <div class="time">{{list[on].created_time}}</div>
+                <div class="name">{{onMessage.from_area.name_zh}}</div>
+                <div class="time mt10">{{onMessage.created_time}}</div>
               </div>
+            </template>
+            <template v-else-if="onMessage.type==='guest'">
+              <img class="min-ava" :src="onMessage.to_area.img_url">
+              <div class="flex1">
+                <div class="name">{{onMessage.to_area.name_zh}}</div>
+                <div class="time mt10">{{onMessage.to_area.created_time}}</div>
+              </div>
+            </template>
+            <template v-else-if="onMessage.type==='reply'">
+              <img class="min-ava" :src="onMessage.to_area.img_url">
+              <div class="flex1">
+                <div class="name">{{onMessage.to_area.name_zh}}</div>
+                <div class="time mt10">{{onMessage.to_area.created_time}}</div>
+              </div>
+            </template>
+            <div>
+              <Button class="mr10" type="primary" shape="circle" @click="delLetter" ghost>删除</Button>
+              <Button type="primary" shape="circle" @click="replyLetter">回复</Button>
+            </div>
+          </div>
+          <template v-if="onMessage.id">
+            <div class="title">{{onMessage.title}}</div>
+            <div class="content">{{onMessage.content}}</div>
+            <div class="mt20" v-for="(file, index) in onMessage.attachments" :key="index">
               <div>
-                <Button class="mr10" type="primary" shape="circle" ghost>删除</Button>
-                <Button type="primary" shape="circle">回复</Button>
+                <Button type="text" :to="file.url" target="_blank" :download="file.name" icon="ios-link">{{file.name}}</Button>
               </div>
             </div>
-            <div class="title">{{list[on].email}}</div>
-            <div class="content">{{list[on].content}}</div>
           </template>
           <template v-else>
             <Icon type="ios-arrow-dropleft" class="mr10" :size="32"/>
@@ -84,16 +121,33 @@
         </Card>
       </Col>
     </Row>
+    <letter-edit :type="letterType" :toId="onMessage.id" @submit="reloadLetter" v-model="activeLetter"></letter-edit>
   </div>
 </template>
 
 <script>
+import letterEdit from '../../components/letter/edit'
 export default {
   name: 'letter',
+  components: { letterEdit },
+  props: {
+    id: {
+      type: [String, Number]
+    }
+  },
   data () {
     return {
       on: '',
-      status: ['未读', '已读'],
+      letterType: 'start',
+      activeLetter: false,
+      letterId: undefined,
+      types: [
+        { type: 'readStatus', label: '未读', value: 0 },
+        { type: 'readStatus', label: '已读', value: 1 },
+        { type: 'type', label: '发起', value: 'start' },
+        { type: 'type', label: '回复', value: 'reply' },
+        { type: 'type', label: '访客留言', value: 'guest' }
+      ],
       list: [],
       onState: '',
       page: 1,
@@ -104,28 +158,95 @@ export default {
         replyNum: 0,
         startNum: 0,
         total: 0
+      },
+      onMessage: {
+        id: undefined,
+        from_area: {}
       }
     }
   },
   created () {
+    if (this.id) {
+      this.selectLetter(this.id)
+    }
     this.getListData()
     this.getData()
   },
+  watch: {
+    id (val) {
+      if (val) {
+        this.selectLetter(this.id)
+      }
+    }
+  },
   methods: {
+    selectType (val) {
+      this.onState = val
+      this.changeStatus()
+    },
+    selectLetter (id) {
+      this.$api.getMessage({ id }).then(res => {
+        if (res.code === 200) {
+          this.onMessage = { ...res.data, attachments: JSON.parse(res.data.attachments || '[]') }
+          res.data.read_status === 0 && this.getListData()
+        }
+      }).catch(err => {
+        this.$Message.error(err && err.desc ? err.desc : err)
+      })
+    },
+    replyLetter (id) {
+      // this.letterId = this.onMessage.id
+      this.letterType = 'reply'
+      this.activeLetter = true
+      this.replyId = id
+    },
+    delLetter () {
+      this.$Modal.confirm({
+        title: '确定要删除吗？',
+        content: '请谨慎操作！',
+        onOk: () => {
+          this.$api.delMessage({ id: this.onMessage.id }).then(res => {
+            if (res.code === 200) {
+              this.getListData()
+              this.onMessage = { id: undefined, from_area: {} }
+              this.$Message.success('删除成功')
+            }
+          }).catch(err => {
+            this.$Message.error(err && err.desc ? err.desc : err)
+          })
+        }
+      })
+    },
+    addLetter () {
+      this.letterType = 'start'
+      this.onMessage = {
+        id: undefined,
+        from_area: {}
+      }
+      this.activeLetter = true
+    },
+    reloadLetter () {
+      this.page = 1
+      this.$Message.success('发送成功！')
+      this.getListData()
+    },
     changeStatus () {
       this.page = 1
-      this.on = ''
+      // this.onMessage = { id: undefined, from_area: {} }
       this.getListData()
     },
     getData () {
       this.$api.getMessageNum().then(res => {
         this.sta = res.data
+      }).catch((err) => {
+        this.$Message.error(err && err.desc ? err.desc : err)
       })
     },
     getListData () {
       this.loading = true
       // let params = { ...this.searchParams, ...this.page_info, sortBy: 'sort' }
-      this.$api.getMessageList({ readStatus: this.on, page: this.page, limit: this.limit }).then(res => {
+      let typeData = this.onState === '' || this.onState === undefined ? {} : { [this.types[this.onState].type]: this.types[this.onState].value }
+      this.$api.getMessageList({ ...typeData, page: this.page, limit: this.limit }).then(res => {
         if (res.code === 200) {
           this.list = res.data
           this.total = res.page_info.total
@@ -158,6 +279,9 @@ export default {
   }
 }
 .nodata {
+  .ivu-card-head {
+    padding: 0;
+  }
   .ivu-card-body {
     height: 100%;
     display: flex;
@@ -198,6 +322,7 @@ export default {
     flex: 1;
     padding: 21px 0;
     text-align: center;
+    cursor: pointer;
     .value {
       margin-top: 5px;
       font-size: 28px;

@@ -20,22 +20,22 @@
                 </RadioGroup>
               </div>
               <div class="nums mt10">
-                <div class="column-center">
+                <router-link to="/organization/list" class="column-center">
                   <div class="title">介绍</div>
-                  <div class="value">1</div>
-                </div>
-                <div class="column-center" v-if="tabs[lang][4]">
+                  <div class="value">{{introduceNum}}</div>
+                </router-link>
+                <router-link :to="'/organization/jujiao?org_id='+tabs[lang][0].list[0].id+'&org_arti_type=csdsj&name='+tabs[lang][0].list[0].name" class="column-center" v-if="tabs[lang][4]">
                   <div class="title">大事件</div>
                   <div class="value">{{tabs[lang][4].total}}</div>
-                </div>
-                <div class="column-center" v-if="tabs[lang][3]">
+                </router-link>
+                <router-link :to="'/organization/jujiao?org_id='+tabs[lang][0].list[0].id+'&org_arti_type=hdrl&name='+tabs[lang][0].list[0].name" class="column-center" v-if="tabs[lang][3]">
                   <div class="title">活动日历</div>
                   <div class="value">{{tabs[lang][3].total}}</div>
-                </div>
-                <div class="column-center">
+                </router-link>
+                <router-link to="/letter/letter" class="column-center">
                   <div class="title">站内私信</div>
                   <div class="value">{{total}}</div>
-                </div>
+                </router-link>
               </div>
             </div>
           </div>
@@ -111,16 +111,16 @@
             <Col :span="8" class="ptb10" v-for="(item, index) in letterList" :key="index">
               <div class="mes">
                 <div class="mes-top">
-                  <img class="ava" :src="item.from_area.img_url" alt="">
+                  <img class="ava" :src="item.to_area.img_url" alt="">
                   <div class="flex1">
-                    <div class="name">{{item.nickname}}</div>
+                    <div class="name">{{item.title}}</div>
                     <div class="desc">{{item.content}}</div>
                   </div>
                 </div>
                 <div class="bottom">
                   <Icon type="ios-mail-outline" :size="23"/>
                   <div class="value flex1">{{item.read_status==1?'已读':'未读'}}</div>
-                  <Button shape="circle" size="small" type="primary" ghost>编辑</Button>
+                  <Button @click="editLetter(item.id)" shape="circle" size="small" type="primary" ghost>查看</Button>
                 </div>
               </div>
             </Col>
@@ -151,7 +151,7 @@
       <article-edit ref="edit" :item="itemBySet" :operate="operate" :org-arti-type="types[this.onTab]"
                     @editOk="editOkHandle"></article-edit>
     </Modal>
-    <letter-edit @submit="getLetter" v-model="activeLetter"></letter-edit>
+    <letter-edit :id="letterId" @submit="getLetter" v-model="activeLetter"></letter-edit>
   </div>
 </template>
 
@@ -177,10 +177,12 @@ export default {
   },
   data () {
     return {
-      activeLetter: true,
+      letterId: undefined,
+      activeLetter: false,
       operate: 'update',
       boxShow: false,
       orgActive: false,
+      introduceNum: 0,
       onTab: 0,
       inforCardData: [
         { title: '新增用户', icon: 'md-person-add', count: 803, color: '#2d8cf0' },
@@ -245,7 +247,18 @@ export default {
   },
   methods: {
     addLetter () {
+      this.letterId = undefined
       this.activeLetter = true
+    },
+    editLetter (id) {
+      // this.letterId = id
+      // this.activeLetter = true
+      this.$router.push({
+        name: 'letter',
+        params: {
+          id: id
+        }
+      })
     },
     addByMenu (index) {
       this.onTab = index
@@ -319,6 +332,7 @@ export default {
       this.$api.getOrganizationList({ page: 1, limit: 2 }).then(res => {
         if (res.code === 200) {
           this.lang = res.data[0].lang
+          this.introduceNum = res.page_info.total
           this.tabs = Object.assign({}, ...res.data.map(item => ({
             [item.lang]: [
               { name: '介绍', list: [item], total: 1 },
@@ -335,7 +349,7 @@ export default {
       })
     },
     getLetter () {
-      this.$api.getMessageList({ page: 1, limit: 5, type: 'start' }).then(res => {
+      this.$api.getMessageList({ page: 1, limit: 5, types: 'guest,reply', orderBy: 'created_time' }).then(res => {
         if (res.code === 200) {
           this.letterList = res.data
           this.total = res.page_info.total
@@ -422,6 +436,7 @@ export default {
     min-width: 50px;
   }
   .title {
+    color: #666;
     font-size: 12px;
   }
   .value {

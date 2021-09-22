@@ -1,4 +1,6 @@
 import Main from '@/components/main'
+const props = (route) => ({ ...(route.params || {}), ...(route.query || {}) })
+
 // import parentView from '@/components/parent-view'
 
 /**
@@ -34,7 +36,7 @@ export default [
     component: Main,
     meta: {
       hideInMenu: true,
-      notCache: true
+      notCache: false
     },
     children: [
       {
@@ -43,7 +45,7 @@ export default [
         meta: {
           hideInMenu: true,
           title: '首页',
-          notCache: true,
+          notCache: false,
           icon: 'md-home'
         },
         component: () => import('@/view/single-page/home')
@@ -244,6 +246,7 @@ export default [
       {
         path: 'letter',
         name: 'letter',
+        props,
         meta: {
           icon: '_qq',
           title: '消息管理'

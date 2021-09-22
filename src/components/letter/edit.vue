@@ -1,20 +1,20 @@
 <template>
   <div>
-    <Modal v-model="active" :title="modalTitle[type]">
+    <Modal v-model="active" :title="modalTitle[type]" >
       <Form ref="form" :model="form" :rules="rules" :label-width="50">
-        <FormItem label="用户" prop="to_area_id" >
-          <Select v-model="form.to_area_id" clearable placeholder="请选择管理的区域">
-            <Option v-for="(item, index) in users" :value="item.area_id" :key="index">{{item.name}}</Option>
+        <FormItem v-if="type==='start'" label="区域" prop="to_area_id" >
+          <Select v-model="form.to_area_id" clearable placeholder="请选择区域">
+            <Option v-for="(item, index) in areas" :value="item.id" :key="index">{{item.name_zh + ' / ' + item.name_en}}</Option>
           </Select>
         </FormItem>
         <FormItem label="标题" prop="title">
-          <Input v-model="form.title" placeholder="姓名"></Input>
+          <Input v-model="form.title" placeholder="请输入标题"></Input>
         </FormItem>
         <FormItem label="内容" prop="content">
-          <Input type="textarea" v-model="form.content" placeholder="姓名"></Input>
+          <Input type="textarea" v-model="form.content" placeholder="请输入内容"></Input>
         </FormItem>
         <FormItem label="附件" prop="avatar">
-          <upload-file type="message" v-model="form.attachments"></upload-file>
+          <upload-file ref="upload" type="message" v-model="form.attachments"></upload-file>
         </FormItem>
       </Form>
       <div slot="footer">
@@ -37,12 +37,14 @@ export default {
       default: false
     },
     id: {
-      type: Number,
-      default: 0
+      type: [Number, String]
     },
     type: {
       type: String,
       default: 'start'
+    },
+    toId: {
+      type: [Number, String]
     }
   },
   data () {
@@ -54,11 +56,11 @@ export default {
         reply: '回复私信',
         guest: '回复访客留言'
       },
-      users: [],
+      areas: [],
       form: {
         title: '',
         content: '',
-        to_area_id: '',
+        to_area_id: undefined,
         attachments: []
       },
       rules: {
@@ -69,8 +71,25 @@ export default {
     }
   },
   watch: {
-    id () {
-      this.form = { ...this.item }
+    id (val) {
+      this.form = this.$options.data().form
+      setTimeout(() => {
+        this.$refs.form.resetFields()
+        this.$refs.upload.$refs.upload.clearFiles()
+      }, 20)
+      if (val) {
+        this.getData()
+      }
+    },
+    toId (val) {
+      this.$refs.upload.$refs.upload.clearFiles()
+      this.form = this.$options.data().form
+      setTimeout(() => {
+        this.$refs.form.resetFields()
+      }, 20)
+      // if (val) {
+      //   this.getData()
+      // }
     }
   },
   computed: {
@@ -83,18 +102,33 @@ export default {
       }
     }
   },
-  async created () {
-    this.getUsers()
+  created () {
+    this.getAreas()
+    this.id && this.getData()
   },
   mounted () {
   },
   beforeDestroy () {
   },
   methods: {
-    async getUsers () {
-      this.$api.getUserList({ limit: 5000, page: 1 }).then(res => {
+    getData () {
+      this.$api.getMessage({ id: this.id }).then(res => {
         if (res.code === 200) {
-          this.users = res.data
+          this.form = {
+            title: res.data.title,
+            content: res.data.content,
+            to_area_id: res.data.to_area_id,
+            attachments: JSON.parse(res.data.attachments || '[]')
+          }
+        }
+      }).catch(err => {
+        this.$Message.error(err && err.desc ? err.desc : err)
+      })
+    },
+    getAreas () {
+      this.$api.areaSelect({ limit: 5000, page: 1 }).then(res => {
+        if (res.code === 200) {
+          this.areas = res.data
         }
       }).catch(err => {
         this.$Message.error(err && err.desc ? err.desc : err)
@@ -107,7 +141,13 @@ export default {
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.loading = true
-          this.$api.addMessage({ ...this.form, id: this.id, type: this.type, attachments: JSON.stringify(this.form.attachments) }).then(res => {
+          this.$api.addMessage({
+            ...this.form,
+            // id: this.id,
+            target_id: this.toId,
+            type: this.type,
+            attachments: JSON.stringify(this.form.attachments)
+          }).then(res => {
             this.loading = false
             if (res.code === 200) {
               this.$emit('submit')
