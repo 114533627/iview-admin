@@ -141,7 +141,7 @@ export default {
         org_id: [{ type: 'number', required: true, message: '请选择所属机构', trigger: 'change' }],
         org_arti_type: [{ type: 'string', required: true, message: '请选择机构内容类型', trigger: 'change' }],
         img_url: [{ type: 'string', required: true, message: '请上传图片', trigger: 'blur' }],
-        name: [{ required: true, message: '请输入标题', trigger: 'blur' }, { type: 'string', max: 50, message: '长度不超过50个字符', trigger: 'blur' }]
+        name: [{ required: true, message: '请输入标题', trigger: 'blur' }, { type: 'string', max: 500, message: '长度不超过500个字符', trigger: 'blur' }]
       }
     }
   },
