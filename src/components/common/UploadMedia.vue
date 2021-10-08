@@ -5,7 +5,8 @@
       <template v-if="item.url">
         <img :src="item.url" v-if="/\.(png|jpg|gif|jpeg|webp)$/.test(item.url)">
         <video :src="item.url" v-if="/\.(mp4|avi)$/i.test(item.url)" controls="controls" width="500" height="400"></video>
-        <div class="demo-upload-list-cover">
+        <a v-else :href="item.url" :download="item.url.substring(item.url.lastIndexOf('.'))" >下载</a>
+        <div v-if="/\.(png|jpg|gif|jpeg|webp|mp4|avi)$/.test(item.url)"  class="demo-upload-list-cover">
           <Icon type="ios-eye-outline" @click.native="handleView(item)"></Icon>
           <Icon type="ios-trash-outline" @click.native="handleRemove(item)"></Icon>
         </div>
@@ -20,8 +21,8 @@
       :default-file-list="selfDefaultList"
       :on-success="handleSuccess"
       :on-error="handleError"
-      :format="['jpg','jpeg','png','mp4','avi']"
-      :max-size="20480"
+      :format="format"
+      :max-size="maxSize"
       :on-format-error="handleFormatError"
       :on-exceeded-size="handleMaxSize"
       :before-upload="handleBeforeUpload"
@@ -62,6 +63,14 @@ export default {
     },
     uploadParam: {
       type: Object
+    },
+    format: {
+      type: Array,
+      default: () => ['jpg', 'jpeg', 'png', 'mp4', 'avi']
+    },
+    maxSize: {
+      type: Number,
+      default: 20480
     }
   },
   watch: {

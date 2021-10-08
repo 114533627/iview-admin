@@ -5,6 +5,9 @@
         <FormItem prop="kwd">
           <Input v-model="searchParams.kwd" clearable placeholder="搜索关键词"></Input>
         </FormItem>
+        <FormItem prop="id">
+          <Input v-model="searchParams.id" clearable placeholder="内容ID"></Input>
+        </FormItem>
         <FormItem prop="lang">
           <Select v-model="searchParams.lang" clearable style="width:200px" placeholder="请选择语言">
             <Option v-for="item in langTypeEnums" :value="item.value" :key="item.value">{{ item.label }}</Option>
@@ -81,7 +84,10 @@ export default {
       loading: false,
       dataList: [],
       searchParams: {
-        kwd: ''
+        kwd: '',
+        id: '',
+        lang: '',
+        type: ''
       },
       page_info: {
         page: 1,
@@ -205,17 +211,20 @@ export default {
         },
         {
           title: '操作',
-          width: 150,
+          width: 250,
           render: (h, { row, column, index }) => {
             return h(Operate, {
               props: {
-                need: { detail: false, edit: true, del: true, seo: true },
-                rowData: row
+                need: { edit: true, del: true, seo: true, articleStatusPass: row.status !== 1 && ['hdrl', 'csdsj'].includes(row.type), articleStatusNoPass: row.status !== 2 && ['hdrl', 'csdsj'].includes(row.type) },
+                rowData: row,
+                privCodes: { edit: 'article_edit', del: 'article_del', articleStatusPass: 'article_status_pass', articleStatusNoPass: 'article_status_no_pass', seo: 'seo_edit' }
               },
               on: {
                 edit: this.editHandle,
                 del: this.delHandle,
-                seo: this.seoHandle
+                seo: this.seoHandle,
+                articleStatusPass: this.articleStatusPassHandle,
+                articleStatusNoPass: this.articleStatusNoPassHandle
               }
             })
           }
@@ -224,6 +233,7 @@ export default {
     }
   },
   async created () {
+    if (this.$route.params.id) this.searchParams.id = this.$route.params.id
     await this.getOrgs()
     this.getDataList()
   },
@@ -330,6 +340,20 @@ export default {
     },
     seoOkHandle () {
       // do nothing
+    },
+    articleStatusPassHandle (row) {
+      let params = { id: row.id, status: 1 }
+      this.$api.updateArticleStatus(params).then(res => {
+        this.$Message.success('操作成功')
+        this.getDataList()
+      }).catch(err => this.$Message.error('操作失败'))
+    },
+    articleStatusNoPassHandle (row) {
+      let params = { id: row.id, status: 2 }
+      this.$api.updateArticleStatus(params).then(res => {
+        this.$Message.success('操作成功')
+        this.getDataList()
+      }).catch(err => this.$Message.error('操作失败'))
     }
   }
 }

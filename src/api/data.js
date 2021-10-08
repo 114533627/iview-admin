@@ -247,6 +247,14 @@ export const delArticle = ({ id }) => {
     params: { id }
   })
 }
+// 修改状态
+export const updateArticleStatus = (params) => {
+  return axios.request({
+    url: '/v1/article/status',
+    method: 'put',
+    data: params
+  })
+}
 // 获取用户列表
 export const getUserList = (params) => {
   return axios.request({
@@ -486,5 +494,53 @@ export const areaSelect = (params) => {
     url: '/v1/admin/area_select',
     method: 'get',
     params
+  })
+}
+// 获取留资列表
+export const getArticleNoteList = (params) => {
+  return axios.request({
+    url: '/v1/admin/article_note',
+    method: 'get',
+    params: params
+  })
+}// 导出留资列表
+export const exportArticleNoteList = (params) => {
+  return axios.request({
+    url: '/v1/admin/article_note/export_excel',
+    method: 'get',
+    params: params,
+    responseType: 'arraybuffer'
+  })
+}
+// 添加留资信息
+export const addArticleNote = (params) => {
+  return axios.request({
+    url: '/v1/admin/article_note',
+    method: 'post',
+    data: params
+  })
+}
+// 修改留资信息
+export const updateArticleNote = (params) => {
+  return axios.request({
+    url: '/v1/admin/article_note',
+    method: 'put',
+    data: params
+  })
+}
+// 删除留资信息
+export const delArticleNote = ({ id }) => {
+  return axios.request({
+    url: '/v1/admin/article_note',
+    method: 'delete',
+    params: { id }
+  })
+}
+// 修改留资状态
+export const updateArticleNoteStatus = (params) => {
+  return axios.request({
+    url: '/v1/admin/article_note/status',
+    method: 'put',
+    data: params
   })
 }

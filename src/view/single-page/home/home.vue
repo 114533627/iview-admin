@@ -24,11 +24,11 @@
                   <div class="title">介绍</div>
                   <div class="value">{{introduceNum}}</div>
                 </router-link>
-                <router-link :to="'/organization/jujiao?org_id='+tabs[lang][0].list[0].id+'&org_arti_type=csdsj&name='+tabs[lang][0].list[0].name" class="column-center" v-if="tabs[lang][4]">
+                <router-link :to="'/organization/relation?org_id='+tabs[lang][0].list[0].id+'&org_arti_type=csdsj&name='+tabs[lang][0].list[0].name" class="column-center" v-if="tabs[lang][4]">
                   <div class="title">大事件</div>
                   <div class="value">{{tabs[lang][4].total}}</div>
                 </router-link>
-                <router-link :to="'/organization/jujiao?org_id='+tabs[lang][0].list[0].id+'&org_arti_type=hdrl&name='+tabs[lang][0].list[0].name" class="column-center" v-if="tabs[lang][3]">
+                <router-link :to="'/organization/relation?org_id='+tabs[lang][0].list[0].id+'&org_arti_type=hdrl&name='+tabs[lang][0].list[0].name" class="column-center" v-if="tabs[lang][3]">
                   <div class="title">活动日历</div>
                   <div class="value">{{tabs[lang][3].total}}</div>
                 </router-link>
@@ -66,7 +66,7 @@
     </Row>
     <div class="home-tab" v-if="tabs[lang].length">
       <Tabs type="card" v-model="onTab">
-        <router-link v-if="onTab" :to="'/organization/jujiao?org_id='+tabs[lang][0].list[0].id+'&org_arti_type='+types[onTab]+'&name='+tabs[lang][0].list[0].name" slot="extra">
+        <router-link v-if="onTab" :to="'/organization/relation?org_id='+tabs[lang][0].list[0].id+'&org_arti_type='+types[onTab]+'&name='+tabs[lang][0].list[0].name" slot="extra">
           <Button type="primary" shape="circle">查看全部</Button>
         </router-link>
         <router-link v-else to="/organization/list" slot="extra">
