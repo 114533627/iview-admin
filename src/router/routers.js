@@ -155,7 +155,7 @@ export default [
         component: () => import('@/view/organization/organizationList.vue')
       },
       {
-        path: 'jujiao',
+        path: 'relation',
         name: 'organizationArticles',
         meta: {
           hideInMenu: true,
@@ -252,6 +252,25 @@ export default [
           title: '消息管理'
         },
         component: () => import('@/view/letter/main.vue')
+      }
+    ]
+  },
+  {
+    path: '/article_note',
+    name: 'article_note',
+    component: Main,
+    meta: {
+      hideInBread: true
+    },
+    children: [
+      {
+        path: 'list',
+        name: 'article_note',
+        meta: {
+          icon: '_qq',
+          title: '留资管理'
+        },
+        component: () => import('@/view/article-note/articleNoteList.vue')
       }
     ]
   },

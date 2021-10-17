@@ -14,13 +14,13 @@
         <Input v-model="form.name" style="width: 60%" placeholder="名称"></Input>
       </FormItem>
       <FormItem label="标识" prop="code">
-        <Input v-model="form.code" style="width: 60%" placeholder="标识"></Input>
+        <Input v-model="form.code" :disabled="form.id" style="width: 60%" placeholder="标识"></Input>
       </FormItem>
       <FormItem v-if="form.type!=='json'" label="值" prop="val">
-        <Input v-model="form.val" style="width: 60%" placeholder="文本值"></Input>
+        <Input type="textarea"  v-model="form.val" :autosize="{minRows: 8,maxRows: 15}" placeholder="文本值"></Input>
       </FormItem>
       <FormItem v-if="form.type=='json'" label="值" prop="json_val">
-        <Input v-model="form.json_val" type="textarea" :autosize="{minRows: 8,maxRows:15}"  placeholder="JSON"></Input>
+        <Input v-model="form.json_val" type="textarea" :autosize="{minRows: 8,maxRows: 15}"  placeholder="JSON"></Input>
       </FormItem>
       <FormItem label="备注" prop="remark">
         <Input  v-model="form.remark" style="width: 60%" placeholder="remark"></Input>

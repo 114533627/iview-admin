@@ -38,8 +38,8 @@
         <FormItem label="标题" prop="name">
           <Input v-model="form.name" style="width: 60%" placeholder="内容标题"></Input>
         </FormItem>
-        <FormItem label="内容链接" prop="link_url" v-if="form.type!=='img'">
-          <Input v-model="form.link_url" placeholder="内容页面链接。前台访问该内容的页面链接"></Input>
+        <FormItem label="内容链接" prop="link_url" >
+          <Input v-model="form.link_url" :disabled="form.type!=='img'" style="width: 60%" placeholder="内容页面链接。前台访问该内容的页面链接"></Input>
         </FormItem>
         <FormItem :label="`关联${form.lang=='zh' ? '英文' : '中文'}版本内容信息`" prop="to_id" v-if="form.type!=='img'">
           <Select v-model="form.to_id" clearable style="width:300px" :placeholder="`关联${form.lang=='zh' ? '英文' : '中文'}版本内容信息，输入一个空格试试`" filterable>
@@ -49,12 +49,20 @@
         <FormItem label="图片" prop="img_url">
           <upload-media :max="1" :upload-param="{tableName: 'article',targetId: ''}" :default-list="form.img_url ? [{url: form.img_url}] : []" @uploadOver="(filelist) => uploadOverHandle(filelist,'img_url')"></upload-media>
         </FormItem>
-
+        <FormItem label="是否留资" prop="has_form" v-if="['hdrl', 'csdsj'].includes(form.type)">
+          <i-switch v-model="form.has_form" true-color="#13ce66" false-color="#ddd" :true-value="1" :false-value="0" />
+        </FormItem>
+        <FormItem label="是否专题" prop="is_zhuanti" v-if="['csdsj'].includes(form.type)">
+          <i-switch v-model="form.is_zhuanti" true-color="#13ce66" false-color="#ddd" :true-value="1" :false-value="0" />
+        </FormItem>
         <FormItem label="简介" prop="introduction" v-if="form.type!=='img'">
           <Input v-model="form.introduction" type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="简介" />
         </FormItem>
-        <FormItem  label="内容" prop="content" v-if="form.type!=='img'">
+        <FormItem  label="内容" prop="content" v-if="form.type!=='img'&& form.is_zhuanti!==1">
           <ueditor ref="editor" v-model="form.content" :upload-params="{tableName: 'article'}" />
+        </FormItem>
+        <FormItem  label="专题压缩文件" prop="content" v-if="['csdsj'].includes(form.type)&& form.is_zhuanti===1">
+          <upload-media :max="1" :format="['zip']" :upload-param="{tableName: 'article',targetId: ''}" :default-list="form.content && form.content.startsWith('http') ? [{url: form.content}] : []" @uploadOver="(filelist) => uploadOverHandle(filelist,'content')"></upload-media>
         </FormItem>
         <FormItem v-show="showFooter">
           <Button type="primary" @click="handleCancel('form')">取消</Button>
@@ -141,7 +149,7 @@ export default {
         org_id: [{ type: 'number', required: true, message: '请选择所属机构', trigger: 'change' }],
         org_arti_type: [{ type: 'string', required: true, message: '请选择机构内容类型', trigger: 'change' }],
         img_url: [{ type: 'string', required: true, message: '请上传图片', trigger: 'blur' }],
-        name: [{ required: true, message: '请输入标题', trigger: 'blur' }, { type: 'string', max: 50, message: '长度不超过50个字符', trigger: 'blur' }]
+        name: [{ required: true, message: '请输入标题', trigger: 'blur' }, { type: 'string', max: 500, message: '长度不超过500个字符', trigger: 'blur' }]
       }
     }
   },

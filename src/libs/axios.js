@@ -54,6 +54,7 @@ class HttpRequest {
     // 响应拦截
     instance.interceptors.response.use(res => {
       this.destroy(url)
+      if (url.indexOf('export') !== -1) return res // 导出
       const { data, status } = res
       if (data.code && data.code !== 200) return Promise.reject(data)
       return data

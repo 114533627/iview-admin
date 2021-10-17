@@ -9,6 +9,7 @@
         <!--        <FormItem>-->
         <!--          {{title}}-->
         <!--        </FormItem>-->
+
         <FormItem v-if="!(orgArtiType==='ljgd' && dataList.length>=1) && tab==='self'">
           <Button type="primary" @click="addHandle">添加</Button>
         </FormItem>
@@ -17,6 +18,9 @@
         </FormItem>
         <FormItem v-if="tab==='recommend' && orgArtiType!=='ljgd' ">
           <Button type="primary" @click="delRecommendHandle">移除推荐</Button>
+        </FormItem>
+        <FormItem >
+          <a href="/doc/wicco专题大事件素材需求.docx" download="wicco专题大事件素材需求.docx">添加专题大事件帮助文档</a>
         </FormItem>
       </Form>
     </div>
