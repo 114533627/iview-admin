@@ -92,7 +92,7 @@
                 </div>
               </Col>
               <Col :span="6" class="hfill" v-if="!tab.list.length || index0>1">
-                <div @click="add()" class="card add column-center hfill">
+                <div @click="add(index0)" class="card add column-center hfill">
                   <Icon type="md-add" :size="50"/>
                 </div>
               </Col>
@@ -286,13 +286,14 @@ export default {
         this.orgActive = true
       }
     },
-    add () {
+    add (index) {
       this.itemBySet = {}
       this.indexBySet = this.tabs[this.lang][this.onTab].list.length + 1
       this.boxShow = true
       this.operate = 'add'
       setTimeout(() => {
         this.$refs.edit.$refs.form.resetFields()
+        this.itemBySet = { org_arti_type: this.types[index], org_id: this.tabs[this.lang][0].list[0].id }
       }, 20)
     },
     getTabsData () {
