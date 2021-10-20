@@ -55,6 +55,9 @@
         <FormItem label="是否专题" prop="is_zhuanti" v-if="['csdsj'].includes(form.type)">
           <i-switch v-model="form.is_zhuanti" true-color="#13ce66" false-color="#ddd" :true-value="1" :false-value="0" />
         </FormItem>
+        <FormItem label="活动地址" prop="address"  v-if="['hdrl', 'csdsj'].includes(form.type)">
+          <Input v-model="form.address" type="textarea" :autosize="{minRows: 2,maxRows: 3}" placeholder="活动地址" />
+        </FormItem>
         <FormItem label="简介" prop="introduction" v-if="form.type!=='img'">
           <Input v-model="form.introduction" type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="简介" />
         </FormItem>
