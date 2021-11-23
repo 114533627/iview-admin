@@ -471,7 +471,18 @@
 
     return protocol + res.join('/')
   }
+  // 按需自定义修改配置
+  window.UEDITOR_CONFIG = Object.assign(window.UEDITOR_CONFIG, {
+    autoHeightEnabled: false, // 编辑器不自动被内容撑高
+    initialFrameHeight: 500, // 初始容器高度
+    initialFrameWidth: '100%', // 初始宽度
+    serverUrl: '/api/sys/ueditor/exec', // 上传文件接口
+    // headers: { Authorization: 'Bearer ' + this.$store.getters.token },
+    UEDITOR_HOME_URL: '/UEditor/', // UEditor 资源文件的存放路径
+    zIndex: 9000 // 层级
+  })
 
+  console.log(window.UEDITOR_CONFIG)
   window.UE = {
     getUEBasePath: getUEBasePath
   }

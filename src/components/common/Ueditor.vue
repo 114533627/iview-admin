@@ -1,6 +1,6 @@
 <template>
   <div >
-    <vue-ueditor-wrap :editor-id="editorId"  v-model="msg" :config="myConfig"></vue-ueditor-wrap>
+    <vue-ueditor-wrap :editor-id="editorId" :editor-dependencies="editorDependencies"  v-model="msg" :config="myConfig" @before-init="beforeInit"></vue-ueditor-wrap>
   </div>
 </template>
 
@@ -33,33 +33,40 @@ export default {
   },
   created () {
     this.msg = this.value
+    this.myConfig = {
+      autoHeightEnabled: false, // 编辑器不自动被内容撑高
+      initialFrameHeight: 500, // 初始容器高度
+      initialFrameWidth: '100%', // 初始宽度
+      serverUrl: '/api/sys/ueditor/exec', // 上传文件接口
+      headers: { Authorization: 'Bearer ' + this.$store.getters.token },
+      UEDITOR_HOME_URL: '/UEditor/', // UEditor 资源文件的存放路径
+      zIndex: 9000 // 层级
+    }
+    this.editorDependencies = [
+      'ueditor.config.js',
+      'ueditor.all.min.js',
+      'lang/zh-cn/zh-cn.js'
+    ]
   },
   data () {
     return {
       editorId: parseInt(Math.random() * 1000000) + '',
       editor: null,
       msg: '',
-      myConfig: {
-        autoHeightEnabled: false, // 编辑器不自动被内容撑高
-        initialFrameHeight: 500, // 初始容器高度
-        initialFrameWidth: '100%', // 初始宽度
-        serverUrl: '/api/sys/ueditor/exec', // 上传文件接口
-        headers: { Authorization: 'Bearer ' + this.$store.getters.token },
-        UEDITOR_HOME_URL: '/UEditor/', // UEditor 资源文件的存放路径
-        zIndex: 9000 // 层级
-      }
+      myConfig: {},
+      editorDependencies: [ ]
     }
   },
   methods: {
-    beforeInit () {
-      console.log(this.editorId)
+    beforeInit (editorId) {
+      // console.log('editorId:', editorId)
       if (this.editorId) {
         this.editor = UE.getEditor(this.editorId) // 初始化UE
         this.editor.addListener('ready', () => {
           this.$emit('getUe', this.msg)
         })
       }
-      UE.Editor.prototype._bkGetActionUrl = UE.Editor.prototype.getActionUrl
+      if (!UE.Editor.prototype._bkGetActionUrl) UE.Editor.prototype._bkGetActionUrl = UE.Editor.prototype.getActionUrl
       UE.Editor.prototype.getActionUrl = function (action) {
         let actionUrl = ''
         if (action === 'uploadimage') {
@@ -79,7 +86,7 @@ export default {
     }
   },
   mounted () {
-    setTimeout(() => this.beforeInit(), 1000)
+    // setTimeout(() => this.beforeInit(), 1000)
   },
   destroyed () {
     // if (this.editor) this.editor.destroy()
