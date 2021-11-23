@@ -73,6 +73,8 @@ export default {
           actionUrl = '/api/v1/common/ueditor/upload_file'
         } else if (action === 'uploadvideo') {
           actionUrl = '/api/v1/common/ueditor/upload_file'
+        } else if (action === 'config') {
+          actionUrl = '/UEditor/my_ueditor.json'
         } else {
           return UE.Editor.prototype._bkGetActionUrl.call(this, action)
         }
