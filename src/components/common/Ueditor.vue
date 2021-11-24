@@ -1,6 +1,6 @@
 <template>
   <div >
-    <vue-ueditor-wrap :editor-id="editorId" :editor-dependencies="editorDependencies"  v-model="msg" :config="myConfig" @before-init="beforeInit"></vue-ueditor-wrap>
+    <vue-ueditor-wrap :editor-id="editorId" :editor-dependencies="editorDependencies"  v-model="msg" :config="myConfig" @ready="readyHandle" @before-init="beforeInit"></vue-ueditor-wrap>
   </div>
 </template>
 
@@ -58,14 +58,12 @@ export default {
     }
   },
   methods: {
+    readyHandle (editor) {
+      this.editor = editor
+    },
     beforeInit (editorId) {
       // console.log('editorId:', editorId)
-      if (this.editorId) {
-        this.editor = UE.getEditor(this.editorId) // 初始化UE
-        this.editor.addListener('ready', () => {
-          this.$emit('getUe', this.msg)
-        })
-      }
+
       if (!UE.Editor.prototype._bkGetActionUrl) UE.Editor.prototype._bkGetActionUrl = UE.Editor.prototype.getActionUrl
       UE.Editor.prototype.getActionUrl = function (action) {
         let actionUrl = ''
