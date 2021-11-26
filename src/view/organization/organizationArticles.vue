@@ -267,7 +267,7 @@ export default {
     getDataList () {
       let { org_id, org_arti_type } = this.$route.query
       this.loading = true
-      let params = { orgId: org_id, orgArtiType: org_arti_type, page: 1, limit: 1000, tab: this.tab }
+      let params = { orgId: org_id, orgArtiType: org_arti_type, page: 1, limit: 1000, tab: this.tab, orderBy: 'article.modified_time' }
       this.$api.getArticleList(params).then(res => {
         this.loading = false
         if (res.code === 200) {
