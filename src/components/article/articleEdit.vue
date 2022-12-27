@@ -24,7 +24,7 @@
             <Option v-for="item in orgArtiTypeEnums" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
         </FormItem>
-        <FormItem label="起止时间" prop="time" v-if="form.type==='csdsj' || form.type==='hdrl'">
+        <FormItem label="起止时间" prop="time" v-if="form.type==='csdsj' || form.type==='hdrl' || form.type==='viewpoint'">
           <Row>
             <Col span="10">
               <DatePicker type="datetimerange" style="width: 320px" placeholder="起止时间" v-model="datatimeRange"></DatePicker>
@@ -49,13 +49,13 @@
         <FormItem label="图片" prop="img_url">
           <upload-media :max="1" :upload-param="{tableName: 'article',targetId: ''}" :default-list="form.img_url ? [{url: form.img_url}] : []" @uploadOver="(filelist) => uploadOverHandle(filelist,'img_url')"></upload-media>
         </FormItem>
-        <FormItem label="是否留资" prop="has_form" v-if="['hdrl', 'csdsj'].includes(form.type)">
+        <FormItem label="是否留资" prop="has_form" v-if="['hdrl', 'csdsj','viewpoint'].includes(form.type)">
           <i-switch v-model="form.has_form" true-color="#13ce66" false-color="#ddd" :true-value="1" :false-value="0" />
         </FormItem>
         <FormItem label="是否专题" prop="is_zhuanti" v-if="['csdsj'].includes(form.type)">
           <i-switch v-model="form.is_zhuanti" true-color="#13ce66" false-color="#ddd" :true-value="1" :false-value="0" />
         </FormItem>
-        <FormItem label="活动地址" prop="address"  v-if="['hdrl', 'csdsj'].includes(form.type)">
+        <FormItem label="活动地址" prop="address"  v-if="['hdrl', 'csdsj','viewpoint'].includes(form.type)">
           <Input v-model="form.address" type="textarea" :autosize="{minRows: 2,maxRows: 3}" placeholder="活动地址" />
         </FormItem>
         <FormItem label="简介" prop="introduction" v-if="form.type!=='img'">
@@ -96,7 +96,7 @@ export default {
   watch: {
     item () {
       this.form = { ...this.item }
-      if (this.form.type === 'csdsj' || this.form.type === 'hdrl') {
+      if (this.form.type === 'csdsj' || this.form.type === 'hdrl' || this.form.type === 'viewpoint') {
         this.datatimeRange = []
         if (this.form.start_time === 'Invalid Date') this.form.start_time = ''
         if (this.form.end_time === 'Invalid Date') this.form.end_time = ''
@@ -222,7 +222,7 @@ export default {
             let res = null
             let params = { ...this.form }
             if (this.form.deploy_time)params.deploy_time = this.$dayjs(this.form.deploy_time).format('YYYY-MM-DD HH:mm:ss')
-            if (this.datatimeRange.length > 0 && (this.form.type === 'csdsj' || this.form.type === 'hdrl')) {
+            if (this.datatimeRange.length > 0 && (this.form.type === 'csdsj' || this.form.type === 'hdrl' || this.form.type === 'viewpoint')) {
               params.start_time = this.$dayjs(this.datatimeRange[0]).format('YYYY-MM-DD HH:mm:ss')
               params.end_time = this.$dayjs(this.datatimeRange[1]).format('YYYY-MM-DD HH:mm:ss')
             }

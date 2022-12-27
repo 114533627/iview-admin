@@ -215,7 +215,7 @@ export default {
           render: (h, { row, column, index }) => {
             return h(Operate, {
               props: {
-                need: { edit: true, del: true, seo: true, articleStatusPass: row.status !== 1 && ['hdrl', 'csdsj'].includes(row.type), articleStatusNoPass: row.status !== 2 && ['hdrl', 'csdsj'].includes(row.type) },
+                need: { edit: true, del: true, seo: true, articleStatusPass: row.status !== 1 && ['hdrl', 'csdsj', 'viewpoint'].includes(row.type), articleStatusNoPass: row.status !== 2 && ['hdrl', 'csdsj', 'viewpoint'].includes(row.type) },
                 rowData: row,
                 privCodes: { edit: 'article_edit', del: 'article_del', articleStatusPass: 'article_status_pass', articleStatusNoPass: 'article_status_no_pass', seo: 'seo_edit' }
               },

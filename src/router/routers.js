@@ -170,6 +170,8 @@ export default [
               title += '活动日历'
             } else if (org_arti_type === 'ljgd') {
               title += '了解更多'
+            } else if (org_arti_type === 'viewpoint') {
+              title += '创合TED'
             }
             return title
           }

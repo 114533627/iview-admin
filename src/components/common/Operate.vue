@@ -8,6 +8,7 @@
     <Button v-if="need.jujiao && hasPermission('jujiao')" type="default" @click="clickHandle('jujiao')">聚焦</Button>
     <Button v-if="need.ljgd && hasPermission('ljgd')" type="default" @click="clickHandle('ljgd')">了解更多</Button>
     <Button v-if="need.hdrl && hasPermission('hdrl')" type="default" @click="clickHandle('hdrl')">活动日历</Button>
+    <Button v-if="need.hdrl && hasPermission('viewpoint')" type="default" @click="clickHandle('viewpoint')">创合TED</Button>
     <Button v-if="need.csdsj && hasPermission('csdsj')" type="default" @click="clickHandle('csdsj')">大事件</Button>
     <Button v-if="need.csjggx && hasPermission('csjggx')" type="default" @click="clickHandle('csjggx')">机构关联</Button>
     <Button v-if="need.role && hasPermission('role')" type="default" @click="clickHandle('role')">角色</Button>
@@ -39,6 +40,7 @@ export default {
         jujiao: false,
         ljgd: false,
         hdrl: false,
+        viewpoint: false,
         csdsj: false,
         csjggx: false,
         role: false,

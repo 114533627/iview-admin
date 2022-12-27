@@ -19,7 +19,7 @@
         <FormItem v-if="tab==='recommend' && orgArtiType!=='ljgd' ">
           <Button type="primary" @click="delRecommendHandle">移除推荐</Button>
         </FormItem>
-        <FormItem >
+        <FormItem v-if="orgArtiType==='csdsj'">
           <a href="/doc/wicco专题大事件素材需求.docx" download="wicco专题大事件素材需求.docx">添加专题大事件帮助文档</a>
         </FormItem>
       </Form>
@@ -84,6 +84,7 @@ export default {
     },
     title () {
       let { name, org_arti_type } = this.$route.query
+      console.log(11, org_arti_type)
       return '机构：' + name + ' > ' + this.getEnumLabelByValue('OrgArtiType', org_arti_type)
     },
     orgArtiType () {
