@@ -171,7 +171,9 @@ export default [
             } else if (org_arti_type === 'ljgd') {
               title += '了解更多'
             } else if (org_arti_type === 'viewpoint') {
-              title += '创合TED'
+              title += '发言集锦'
+            } else if (org_arti_type === 'yjyzx') {
+              title += '研究与咨询'
             }
             return title
           }

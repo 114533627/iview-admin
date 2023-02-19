@@ -168,11 +168,11 @@ export default {
         },
         {
           title: '操作',
-          width: 400,
+          minWidth: 400,
           render: (h, { row, column, index }) => {
             return h(Operate, {
               props: {
-                need: { edit: true, seo: true, jujiao: true, ljgd: true, hdrl: true, csdsj: true, viewpoint: true },
+                need: { edit: true, seo: true, jujiao: true, ljgd: true, hdrl: true, csdsj: true, viewpoint: true, yjyzx: true },
                 rowData: row
               },
               on: {
@@ -183,7 +183,8 @@ export default {
                 ljgd: this.ljgdHandle,
                 hdrl: this.hdrlHandle,
                 csdsj: this.csdsjHandle,
-                viewpoint: this.viewpointHandle
+                viewpoint: this.viewpointHandle,
+                yjyzx: this.yjyzxHandle
               }
             })
           }
@@ -264,11 +265,18 @@ export default {
         query: { org_id: row.id, org_arti_type: 'hdrl', name: row.name }
       })
     },
-    // 创合TED管理
+    // 发言集锦管理
     viewpointHandle (row) {
       this.$router.push({
         name: 'organizationArticles',
         query: { org_id: row.id, org_arti_type: 'viewpoint', name: row.name }
+      })
+    },
+    // 发言集锦管理
+    yjyzxHandle (row) {
+      this.$router.push({
+        name: 'organizationArticles',
+        query: { org_id: row.id, org_arti_type: 'yjyzx', name: row.name }
       })
     },
     // 城市大事件管理
