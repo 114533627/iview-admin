@@ -5,7 +5,7 @@
           <Input v-model="form.id" disabled style="width: 60%" placeholder="内容ID"></Input>
         </FormItem>
         <FormItem label="内容类型" prop="type">
-          <Select v-model="form.type" clearable style="width:200px" placeholder="请选择内容类型">
+          <Select v-model="form.type" clearable style="width:200px" placeholder="请选择内容类型" :disabled="['csdsj','hdrl','viewpoint','yjyzx'].includes(form.type)">
             <Option v-for="item in articleTypeEnums" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
         </FormItem>
@@ -20,7 +20,7 @@
           </Select>
         </FormItem>
         <FormItem label="机构内容类型" prop="org_arti_type">
-          <Select v-model="form.org_arti_type" clearable style="width:200px" placeholder="机构内容关联类型">
+          <Select v-model="form.org_arti_type" clearable style="width:200px" placeholder="机构内容关联类型"  :disabled="['csdsj','hdrl','viewpoint','yjyzx'].includes(form.org_arti_type)">
             <Option v-for="item in orgArtiTypeEnums" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
         </FormItem>
@@ -96,6 +96,7 @@ export default {
   watch: {
     item () {
       this.form = { ...this.item }
+      this.form.type = this.form.type || this.form.org_arti_type
       if (this.form.type === 'csdsj' || this.form.type === 'hdrl' || this.form.type === 'viewpoint') {
         this.datatimeRange = []
         if (this.form.start_time === 'Invalid Date') this.form.start_time = ''
