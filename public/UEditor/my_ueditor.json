@@ -1,5 +1,5 @@
 {
-  "videoMaxSize": 102400000,
+  "videoMaxSize": 1024000000,
   "videoActionName": "uploadvideo",
   "fileActionName": "uploadfile",
   "fileManagerListPath": "/ueditor/jsp/upload/file/",
@@ -81,7 +81,7 @@
   "imageManagerUrlPrefix": "",
   "scrawlUrlPrefix": "",
   "scrawlFieldName": "file",
-  "imageMaxSize": 4086000,
+  "imageMaxSize": 40860000,
   "imageAllowFiles": [
     ".png",
     ".jpg",
