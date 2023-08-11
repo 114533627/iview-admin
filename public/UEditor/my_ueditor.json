@@ -12,7 +12,7 @@
     ".bmp"
   ],
   "imageManagerListPath": "/ueditor/jsp/upload/image/",
-  "fileMaxSize": 51200000,
+  "fileMaxSize": 512000000,
   "fileManagerAllowFiles": [
     ".png",
     ".jpg",
@@ -81,7 +81,7 @@
   "imageManagerUrlPrefix": "",
   "scrawlUrlPrefix": "",
   "scrawlFieldName": "file",
-  "imageMaxSize": 40860000,
+  "imageMaxSize": 408600000,
   "imageAllowFiles": [
     ".png",
     ".jpg",
